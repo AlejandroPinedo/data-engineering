@@ -1,0 +1,16 @@
+# Caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Datos simulados locales (se suben a la nube)
+datos_simulados/input/calidad_enlaces_*.csv
+datos_simulados/archive/calidad_enlaces_*.csv
+
+# Sistema operativo y editores
+.DS_Store
+.ipynb_checkpoints/
+.gemini/
+* Proyecto_DataEngineering_Avance.txt
+extract_pdf.py
+* prueba_conexion_notebook.txt

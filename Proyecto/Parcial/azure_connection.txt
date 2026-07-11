@@ -1,0 +1,3 @@
+{
+  "connection_string": "DefaultEndpointsProtocol=https;AccountName=stdemdsai;AccountKey=2cB6XzvEVkuRyN21PPR+mhXhvlfc544TB02DYxAyLpFR9nzSr7opWbyn+dnYkPN6q2oFmrIHBfT7+ASt9uaxYg==;EndpointSuffix=core.windows.net"
+}

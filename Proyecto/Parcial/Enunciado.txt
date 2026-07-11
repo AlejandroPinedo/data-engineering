@@ -1,0 +1,19 @@
+Buenas tardes. 
+
+Durante esta primera etapa deberán construir un pipeline de datos utilizando Apache Airflow. Este pipeline deberá mover datos desde un servidor simulado (archivos en una carpeta local) hasta un contenedor Raw en Azure Data Lake.
+
+Entregables a considerar: 
+- Presentación parcial (avance del proyecto, máximo 15 slides).
+- ⁠PR a rama feature de repositorio dsai-de-airflow (Incluir screenshot en la presentación)
+
+La presentación parcial del Proyecto Integrador final será el Sábado 06 de Junio 14:30 pm. Será una exposición de 10 minutos como máximo.
+
+Como documentos guía se adjunta:
+
+1. Conexión UTEC Azure: azure_connection.txtDownload azure_connection.txt
+
+2. Enunciado del proyecto: Proyecto_DataEngineering_Avance (1).pdfDownload Proyecto_DataEngineering_Avance (1).pdf
+
+3. Framework Presentación: DE_Proyecto_Avance.pptxDownload DE_Proyecto_Avance.pptx
+
+Ante cualquier consulta y/o duda pueden contactarme directamente al correo atintaya@utec.edu.pe 

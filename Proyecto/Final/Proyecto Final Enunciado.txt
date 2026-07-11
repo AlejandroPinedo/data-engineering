@@ -1,0 +1,19 @@
+En esta segunda etapa, los estudiantes deberán extender el pipeline desarrollado en el proyecto parcial para implementar una solución basada en Medallion Architecture (Bronze, Silver y Gold), incorporando además los principios de Data Mesh.
+
+El objetivo es diseñar e implementar al menos un Data Product que responda a una necesidad de negocio claramente identificada. Para ello, deberán construir el pipeline de datos hasta la capa Gold y publicar los datos finales del Data Product en un catálogo dentro de Databricks, justificando las principales decisiones de diseño e implementación adoptadas.
+
+Además de la implementación técnica, los estudiantes deberán justificar las decisiones de diseño adoptadas, explicar cómo su solución genera valor para el negocio y demostrar la aplicación de los principios de Data Mesh en el contexto del proyecto.
+
+Entregables del Proyecto Final
+
+Presentación ejecutiva (Máximo 10 diapositivas).
+Presentación técnica (Sin límite de diapositivas).
+Pipeline implementado y funcional en Databricks. Deberá incluir una captura de pantalla de la ejecución exitosa del pipeline con el enlace al pipeline en Databricks.
+Repositorio GitHub Actualizado: Es el repositorio utilizado en el proyecto parcial, con las actualizaciones necesarias para el proyecto final.
+Tener en cuenta que la presentación ejecutiva será una simulación de presentación ante el CDO de la empresa y stakeholders del negocio. Dado la cantidad corta de slides, se recomienda ser directo, sin mucho texto, utilizando la estructura: Why - How - What - When.
+
+Podrán ver mayor detalle en los siguientes documentos:: 
+- Guía presentación final: Proyecto_DataEngineering-Final.pdfDownload Proyecto_DataEngineering-Final.pdf
+- Formato Why - How - What - When: DE_Proyecto_Final(Why-What-How_When).pdfDownload DE_Proyecto_Final(Why-What-How_When).pdf
+
+Fecha de entrega: Hasta el 18 de Julio a la media noche.

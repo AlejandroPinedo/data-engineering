@@ -1,0 +1,34 @@
+id_material,descripcion,categoria,proveedor_dueno,cantidad_consignada,cantidad_minima_seguridad,unidad_medida,costo_unitario_usd,ubicacion_almacen,fecha_actualizacion
+MAT-006,Lubricante Multigrado Mobil Delvac 15W-40 (Balde),Lubricantes y Grasas,Mobil Distribuidora,58,36,Baldes,180.0,ALM-C6,2026-06-06 10:33:32
+MAT-005,Cartucho para Gases Acidose Inorganicos 3M,Seguridad e Higiene (EPP),3M Peru S.A.,98,35,Unidades,18.2,ALM-A5,2026-06-06 10:33:32
+MAT-002,Filtro de Aire Camion Minero CAT 797F,Repuestos Motor,Ferreyros S.A.,94,38,Unidades,380.5,ALM-B2,2026-06-06 10:33:32
+MAT-007,Sensor de Temperatura Motor Cummins QSK60,Sensores y Electricos,Komatsu Mitsui,59,20,Unidades,290.0,ALM-C10,2026-06-06 10:33:32
+MAT-005,Cartucho para Gases Acidose Inorganicos 3M,Seguridad e Higiene (EPP),3M Peru S.A.,42,35,Unidades,18.2,ALM-B7,2026-06-06 10:33:32
+MAT-004,Respirador de Doble Via 3M Serie 6200,Seguridad e Higiene (EPP),3M Peru S.A.,67,32,Unidades,45.0,ALM-B6,2026-06-06 10:33:32
+MAT-001,Broca de Perforacion 12 Pulgadas Tritonica,Herramientas de Perforacion,Ferreyros S.A.,40,18,Unidades,1250.0,ALM-C9,2026-06-06 10:33:32
+MAT-001,Broca de Perforacion 12 Pulgadas Tritonica,Herramientas de Perforacion,Ferreyros S.A.,35,20,Unidades,1250.0,ALM-B2,2026-06-06 10:33:32
+MAT-004,Respirador de Doble Via 3M Serie 6200,Seguridad e Higiene (EPP),3M Peru S.A.,63,45,Unidades,45.0,ALM-A8,2026-06-06 10:33:32
+MAT-005,Cartucho para Gases Acidose Inorganicos 3M,Seguridad e Higiene (EPP),3M Peru S.A.,5,44,Unidades,18.2,ALM-B4,2026-06-06 10:33:32
+MAT-004,Respirador de Doble Via 3M Serie 6200,Seguridad e Higiene (EPP),3M Peru S.A.,19,11,Unidades,45.0,ALM-B10,2026-06-06 10:33:32
+MAT-001,Broca de Perforacion 12 Pulgadas Tritonica,Herramientas de Perforacion,Ferreyros S.A.,20,20,Unidades,1250.0,ALM-B2,2026-06-06 10:33:32
+MAT-004,Respirador de Doble Via 3M Serie 6200,Seguridad e Higiene (EPP),3M Peru S.A.,36,33,Unidades,45.0,ALM-A3,2026-06-06 10:33:32
+MAT-002,Filtro de Aire Camion Minero CAT 797F,Repuestos Motor,Ferreyros S.A.,55,30,Unidades,380.5,ALM-A1,2026-06-06 10:33:32
+MAT-005,Cartucho para Gases Acidose Inorganicos 3M,Seguridad e Higiene (EPP),3M Peru S.A.,96,45,Unidades,18.2,ALM-C1,2026-06-06 10:33:32
+MAT-002,Filtro de Aire Camion Minero CAT 797F,Repuestos Motor,Ferreyros S.A.,105,50,Unidades,380.5,ALM-C10,2026-06-06 10:33:32
+MAT-002,Filtro de Aire Camion Minero CAT 797F,Repuestos Motor,Ferreyros S.A.,48,41,Unidades,380.5,ALM-B9,2026-06-06 10:33:32
+MAT-006,Lubricante Multigrado Mobil Delvac 15W-40 (Balde),Lubricantes y Grasas,Mobil Distribuidora,40,21,Baldes,180.0,ALM-A3,2026-06-06 10:33:32
+MAT-008,Zapatas de Oruga Tractor CAT D11T,Repuestos Tren de Rodaje,Ferreyros S.A.,49,37,Unidades,4500.0,ALM-B9,2026-06-06 10:33:32
+MAT-007,Sensor de Temperatura Motor Cummins QSK60,Sensores y Electricos,Komatsu Mitsui,96,44,Unidades,290.0,ALM-C6,2026-06-06 10:33:32
+MAT-008,Zapatas de Oruga Tractor CAT D11T,Repuestos Tren de Rodaje,Ferreyros S.A.,37,32,Unidades,4500.0,ALM-A3,2026-06-06 10:33:32
+MAT-002,Filtro de Aire Camion Minero CAT 797F,Repuestos Motor,Ferreyros S.A.,23,23,Unidades,380.5,ALM-B10,2026-06-06 10:33:32
+MAT-008,Zapatas de Oruga Tractor CAT D11T,Repuestos Tren de Rodaje,Ferreyros S.A.,1,11,Unidades,4500.0,ALM-A2,2026-06-06 10:33:32
+MAT-001,Broca de Perforacion 12 Pulgadas Tritonica,Herramientas de Perforacion,Ferreyros S.A.,10,18,Unidades,1250.0,ALM-A7,2026-06-06 10:33:32
+MAT-005,Cartucho para Gases Acidose Inorganicos 3M,Seguridad e Higiene (EPP),3M Peru S.A.,31,19,Unidades,18.2,ALM-B10,2026-06-06 10:33:32
+MAT-002,Filtro de Aire Camion Minero CAT 797F,Repuestos Motor,Ferreyros S.A.,85,33,Unidades,380.5,ALM-A6,2026-06-06 10:33:32
+MAT-005,Cartucho para Gases Acidose Inorganicos 3M,Seguridad e Higiene (EPP),3M Peru S.A.,36,17,Unidades,18.2,ALM-B4,2026-06-06 10:33:32
+MAT-002,Filtro de Aire Camion Minero CAT 797F,Repuestos Motor,Ferreyros S.A.,19,30,Unidades,380.5,ALM-C4,2026-06-06 10:33:32
+MAT-005,Cartucho para Gases Acidose Inorganicos 3M,Seguridad e Higiene (EPP),3M Peru S.A.,8,14,Unidades,18.2,ALM-B8,2026-06-06 10:33:32
+MAT-001,Broca de Perforacion 12 Pulgadas Tritonica,Herramientas de Perforacion,Ferreyros S.A.,1,17,Unidades,1250.0,ALM-C1,2026-06-06 10:33:32
+MAT-006,Lubricante Multigrado Mobil Delvac 15W-40 (Balde),Lubricantes y Grasas,Mobil Distribuidora,58,36,Baldes,180.0,ALM-C6,2026-06-06 10:33:32
+MAT-099,Filtro Generico Cabina CAT,Repuestos Motor,,5,10,Unidades,150.0,ALM-Z9,2026-06-06 10:33:32
+MAT-002,Filtro de Aire Camion Minero CAT 797F,Repuestos Motor,Ferreyros S.A.,-5,15,Unidades,380.5,ALM-A2,2026-06-06 10:33:32

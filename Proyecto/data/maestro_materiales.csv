@@ -1,0 +1,21 @@
+Material,Material_Description,Proveedor,Categoria,Costo_Unitario_USD,Stock_Seguridad,Punto_Reorden,Lead_Time_Dias
+AM2282383,"BALL;GRINDING,3IN,STL",Moly-Cop Peru S.A.,Medios de Molienda,1.35,150000,250000,15
+AM2282384,"BALL;GRINDING,5IN,STL",Moly-Cop Peru S.A.,Medios de Molienda,2.45,100000,180000,15
+AM2102564,"OIL;RIMULA R4X 15W40,SHELL;MOTOR",Shell Lubricantes,Lubricantes y Grasas,18.5,500,1000,7
+AM2102571,"OIL HYD;SPIRAXS4CX 10W,SHELL;10W,SAE 10",Shell Lubricantes,Lubricantes y Grasas,22.0,600,1200,7
+AM2102575,"COOLNT;NEXO HD ULTRA ELC-N,SHELL",Shell Lubricantes,Refrigerantes,14.8,400,800,10
+AM2124881,"OIL;TELLUS S2VX 46,SHELL",Shell Lubricantes,Lubricantes y Grasas,24.5,500,1000,7
+AM2124873,"GRSE;GADUS S3 V460DX1,SHELL",Shell Lubricantes,Lubricantes y Grasas,19.2,300,600,7
+AM2102574,"OIL;SPIRAX S5CFDM60,SHELL;SAE 60",Shell Lubricantes,Lubricantes y Grasas,28.0,250,500,7
+AM2102572,"OIL;SPIRAX S4 CX30,SHELL;SAE 30",Shell Lubricantes,Lubricantes y Grasas,21.5,350,700,7
+AM2102577,"OIL;OMALA S2 GX 220,SHELL",Shell Lubricantes,Lubricantes y Grasas,26.0,300,600,7
+AM2265276,"LINER;BK58660B,BRADKEN LTD,LOW,PARTB",Bradken Ltd,Revestimientos Molinos,1580.0,24,48,45
+AM2265274,"LINER;BK58660A,BRADKEN LTD;HIGH,A,SHELL",Bradken Ltd,Revestimientos Molinos,1690.0,24,48,45
+AM2265275,"LNR;HIGH,C,SHELL,CRMO,DESCHARGE,INLET",Bradken Ltd,Revestimientos Molinos,1450.0,20,40,45
+AM2265277,"LNR;BK58660D,BRADKEN LTD;LOW,D,SHELL",Bradken Ltd,Revestimientos Molinos,1550.0,20,40,45
+AM2265273,"GRATE MILL;BK58662 SLOT64,BRADKEN LTD",Bradken Ltd,Revestimientos Molinos,2100.0,16,32,45
+AM2106352,"FLTR FUEL;2657899379,EPIROC;SECONDARY",Epiroc Peru S.A.,Repuestos Perforadora,85.0,120,240,12
+AM2106353,"FLTR OIL;2652183233,EPIROC;ENGINE",Epiroc Peru S.A.,Repuestos Perforadora,64.0,150,300,12
+AM2217752,"GSKT;3222322073,EPIROC",Epiroc Peru S.A.,Repuestos Perforadora,12.5,200,400,12
+AE0002528,"REAGENT;FROTHER 1 MIBC,PURO,LIQUIDO",Puro Reactivos S.A.,Reactivos de Flotacion,3.2,8000,15000,20
+AE0002529,"REAGENT;XANTHATE SIBX,PURO,GRANULO",Puro Reactivos S.A.,Reactivos de Flotacion,4.1,12000,22000,20
