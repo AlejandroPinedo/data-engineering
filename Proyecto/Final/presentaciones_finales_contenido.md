@@ -1,7 +1,7 @@
 # Estructura y Contenido de las Presentaciones: Proyecto Final
 ## Maestría en Ciencia de Datos e Inteligencia Artificial - UTEC
 
-Este documento detalla la estructura y el contenido exacto diapositiva por diapositiva para los entregables de presentación del proyecto final, incorporando las prácticas avanzadas de **Data Mesh, Gobernanza, Enmascaramiento PII y Monitoreo** del ejemplo `data_platform` de la clase.
+Este documento detalla la estructura y el contenido exacto diapositiva por diapositiva para los entregables de presentación del proyecto final, incorporando la automatización mediante **Databricks Jobs (Workflows)** y la documentación detallada de las columnas del **Diccionario de Datos** de la capa Gold para el grupo **g102** (G2 de la Sección 1).
 
 ---
 
@@ -12,7 +12,7 @@ Este documento detalla la estructura y el contenido exacto diapositiva por diapo
 * **Título:** Pipeline de Ingesta y Exposición de Data Products para Control de Inventario en Consignación
 * **Subtítulo:** Proyecto Integrador de Ingeniería de Datos (Etapa Final)
 * **Empresa:** Compañía Minera Las Bambas S.A.
-* **Integrantes (Grupo 2):**
+* **Integrantes (Grupo 2 - Sección 1):**
   * David Jimenez
   * Herles Pinedo
   * Jose Nomberto
@@ -33,10 +33,11 @@ Este documento detalla la estructura y el contenido exacto diapositiva por diapo
 
 ### 🛝 Diapositiva 4: HOW (¿Cómo lo estamos solucionando?)
 * **Título:** Arquitectura de Datos Desacoplada y Distribuida
-* **Arquitectura de Ingesta (Airflow + Azure):** Ingesta automática diaria e inmutable de los reportes SAP en local a Azure Data Lake Storage (capa Raw).
+* **Arquitectura de Ingesta (Airflow + Azure):** Ingesta automática diaria e inmutable de los reportes SAP en local a Azure Data Lake Storage (capa Raw, ruta: `raw/airflow/G2`).
+* **Orquestación en Databricks Workflows:** Automatización end-to-end estructurada en tareas secuenciales programadas diariamente (Bronze -> Silver -> Gold -> Refresco/Auditoría).
 * **Arquitectura Medallion en Databricks:**
   * **Bronze:** Consolidación histórica 1:1 de los archivos.
-  * **Silver:** Calidad (deduplicación, tipificación) y enriquecimiento cruzando la data real de transacciones con el maestro de materiales; desvío automático de registros incorrectos a **Cuarentena**.
+  * **Silver:** Calidad (deduplicación, enmascaramiento PII) y enriquecimiento con el maestro de materiales; desvío automático de errores a **Cuarentena**.
   * **Gold:** Modelado de negocio y consolidación de los **3 Data Products**.
 
 ### 🛝 Diapositiva 5: WHAT (¿Qué construimos?)
@@ -48,7 +49,7 @@ Este documento detalla la estructura y el contenido exacto diapositiva por diapo
 ### 🛝 Diapositiva 6: WHAT (Aplicación de Data Mesh y Gobierno del Dato)
 * **Título:** Gobierno del Dato y Descentralización de la Propiedad
 * **Propiedad por Dominio:**
-  * Catálogos independientes creados en Unity Catalog mediante el framework central: `g202_log_reabastecimiento`, `g202_log_consumos`, `g202_fin_conciliacion`.
+  * Catálogos independientes creados en Unity Catalog mediante el registro oficial de la clase: `g102_log_reabastecimiento`, `g102_log_consumos`, `g102_fin_conciliacion`.
 * **Gobernanza Computacional Federada:**
   * **Seguridad PII:** Enmascaramiento dinámico a nivel de columna (UDF SQL) sobre el campo `User Name` (Usuario SAP de mina) para restringir el acceso a no administradores.
   * **Contratos de Datos:** Definición automática de esquemas y reglas de calidad en YAML para garantizar la fiabilidad del Data Product.
@@ -87,15 +88,19 @@ Este documento detalla la estructura y el contenido exacto diapositiva por diapo
 
 ### 📌 Contenido Técnico Relevante
 1. **Diagrama Técnico de Arquitectura:** Detalle del DAG en Airflow, WasbHook, almacenamiento en ADLS Gen2, y flujo de procesamiento Delta Lake en Databricks.
-2. **Modelo de Datos de Capa Silver:** 
+2. **Orquestación con Databricks Jobs (Workflows):**
+   * Topología del Job secuencial programado de forma diaria (`America/Lima`).
+   * Configuración de Job Cluster, políticas de reintentos y notificaciones en caso de fallos.
+3. **Modelo de Datos de Capa Silver:** 
    * Estructura de `silver_movimientos_consignacion`
    * Estructura de `silver_movimientos_cuarentena` (Mapeo de fallas de calidad)
    * Lógica de enmascaramiento dinámico (PII Masking) para el campo `User Name` (Usuario responsable del movimiento).
-3. **Modelado Físico de Data Products (Gold):**
+4. **Modelado Físico y Diccionario de Datos de Data Products (Gold):**
    * Creación de **Vistas Materializadas** (`MATERIALIZED VIEW`) en Databricks Unity Catalog para almacenamiento y actualización física incremental eficiente.
    * Lógica de agregación y cálculo del stock acumulado.
-4. **Gobernanza y SLOs en Unity Catalog:**
+   * **Diccionario de datos detallado columna por columna** (`COMMENT ON COLUMN`) para las 3 vistas materializadas de Gold.
+5. **Gobernanza y SLOs en Unity Catalog:**
    * Script de creación de esquemas y políticas de seguridad (Row-Level Security / Column-Level Security).
-   * Monitoreo del uso de los Data Products consultando la tabla `system.query.history`.
+   * Monitoreo del uso de los Data Products del grupo **g102** consultando la tabla `system.query.history`.
    * Ejemplo de Contrato de Datos YAML del Data Product.
-5. **Logs de Ejecución:** Pantallazos de la corrida del pipeline en Databricks Workflows y visualización de las vistas materializadas resultantes en el panel de gobernanza de Unity Catalog.
+6. **Logs de Ejecución:** Pantallazos de la corrida del pipeline en Databricks Workflows y visualización de las vistas materializadas resultantes en el panel de gobernanza de Unity Catalog.

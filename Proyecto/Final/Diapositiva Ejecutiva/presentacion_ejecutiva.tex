@@ -1,0 +1,213 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+
+% --- Paquetes Básicos ---
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit, backgrounds}
+
+% --- Tema y Colores Institucionales UTEC Posgrado ---
+\usetheme{Madrid}
+\usecolortheme{whale}
+
+% Colores de la plantilla UTEC Posgrado (Gris oscuro y Azul cian)
+\definecolor{UtecCyan}{RGB}{0, 191, 255}       % Azul cian brillante
+\definecolor{UtecDarkGray}{RGB}{50, 50, 50}    % Gris Oscuro institucional
+\definecolor{LightGray}{RGB}{245, 245, 245}    % Fondo suave
+\definecolor{White}{RGB}{255, 255, 255}
+
+% Aplicar colores de marca a Beamer
+\setbeamercolor{palette primary}{bg=UtecDarkGray, fg=white}
+\setbeamercolor{palette secondary}{bg=UtecDarkGray!85, fg=white}
+\setbeamercolor{palette tertiary}{bg=UtecCyan, fg=UtecDarkGray}
+\setbeamercolor{titlelike}{parent=palette primary, fg=UtecDarkGray}
+\setbeamercolor{structure}{fg=UtecCyan}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=UtecDarkGray}
+
+% Estilo de bloques beamer
+\setbeamercolor{block title}{bg=UtecDarkGray, fg=white}
+\setbeamercolor{block body}{bg=LightGray, fg=UtecDarkGray}
+
+% Quitar barra de navegación de Beamer para mayor limpieza visual
+\setbeamertemplate{navigation symbols}{}
+
+% Pie de página minimalista
+\setbeamertemplate{footline}[frame number]
+
+% --- Metadatos de la Presentación ---
+\title[Ingeniería de Datos - Proyecto Final]{INGENIERÍA DE DATOS}
+\subtitle{Proyecto Final: Medallion Architecture \& Data Mesh}
+\author[Grupo G2]{Integrantes: \\ \textbf{Grupo G2 (Sección 1 - g102)}}
+\institute[UTEC]{Universidad de Ingeniería y Tecnología - UTEC Posgrado}
+\date{18 de Julio de 2026}
+
+\begin{document}
+
+% --- Slide 1: Portada (Plantilla UTEC) ---
+{
+\setbeamercolor{background canvas}{bg=UtecDarkGray}
+\begin{frame}[plain]
+    \centering
+    \vspace{1.5cm}
+    {\large \color{UtecCyan} \textbf{CURSO}} \\[0.2cm]
+    {\Huge \color{white} \textbf{INGENIERÍA DE DATOS}} \\[0.6cm]
+    \color{white!80}
+    {\large \textbf{Proyecto Final - Grupo G2}} \\[1.2cm]
+    \footnotesize
+    \color{white!70}
+    Integrantes: herles.pinedo@utec.edu.pe | david.jimenez@utec.edu.pe | jose.nomberto@utec.edu.pe \\
+    kevin.luyo@utec.edu.pe | yessenia.chirinos@utec.edu.pe \\
+    \vspace{0.4cm}
+    UTEC Posgrado | Julio 2026
+\end{frame}
+}
+
+% --- Slide 2: Nombre de la Empresa y Rubro (Plantilla UTEC) ---
+\begin{frame}{Contexto Organizacional}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            {\Huge \color{UtecDarkGray} \textbf{Compañía Minera Los Andes S.A.}} \\
+            \vspace{0.6cm}
+            {\Large \color{UtecCyan} \textbf{RUBRO: Minería polimetálica}} \\
+            \vspace{0.6cm}
+            \small
+            \textbf{Contexto:} Operación a tajo abierto con alta dependencia en la disponibilidad y consumo de repuestos críticos bajo esquemas de inventario en consignación en mina.
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.8, every node/.style={scale=0.8}]
+                \draw[fill=LightGray, draw=UtecDarkGray, thick] (0,0) rectangle (4,3);
+                \node at (2,2.5) [text=UtecDarkGray, font=\bfseries\small] {Operación Minera};
+                \draw[fill=UtecCyan!30, draw=UtecDarkGray] (0.5,0.5) rectangle (1.5,1.5);
+                \draw[fill=UtecDarkGray!20, draw=UtecDarkGray] (2.5,0.5) rectangle (3.5,1.5);
+                \node at (1,1) [text=UtecDarkGray, scale=0.6, align=center] {Tajo\\Abierto};
+                \node at (3,1) [text=UtecDarkGray, scale=0.6, align=center] {Planta\\Concentradora};
+                \draw[->, thick, draw=UtecDarkGray] (1.5,1) -- (2.5,1);
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide 3: Ejemplos - Datasets por rubro (Plantilla UTEC) ---
+\begin{frame}{Ejemplos - Datasets por rubro}
+    \centering
+    \small
+    \begin{table}[h]
+        \begin{tabular}{lll}
+            \toprule
+            \textbf{Rubro} & \textbf{Dataset} & \textbf{Tipos de datos} \\
+            \midrule
+            Retail & sales.csv, products.csv & Transaccional \\
+            Salud & appointments.csv, patients.csv & Registros clínicos \\
+            Finanzas & transactions.csv, customers.csv & Movimientos financieros \\
+            \rowcolor{UtecCyan!20} \textbf{Logística (Nuestro Caso)} & \textbf{MB51\_*.csv, maestro\_materiales.csv} & \textbf{Movimientos e Inventario SAP} \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    \vspace{0.4cm}
+    \footnotesize
+    \color{UtecDarkGray!70}
+    Nota: Para nuestro proyecto final, procesamos la data transaccional real de movimientos históricos de almacén de SAP del rubro logístico.
+\end{frame}
+
+% --- Slide 4: WHY (Plantilla UTEC) ---
+\begin{frame}{WHY -- Por qué estamos haciendo esto?}
+    \textbf{Objetivo: Justificar la existencia del Data Product desde un problema real del negocio.}
+    \vspace{0.4cm}
+    \begin{itemize}
+        \item \textbf{¿Qué necesidad, dolor o desafío existe en el dominio del negocio?}
+          Evitar el riesgo de desabastecimiento en mina y la parada de planta concentradora por falta de repuestos críticos en consignación (ej. medios de molienda y lubricantes).
+        \item \textbf{¿Qué impacto tiene no resolver este problema?}
+          Pérdidas millonarias por horas de parada de planta y exceso de capital de trabajo inmovilizado.
+        \item \textbf{¿Por qué un Data Product es la mejor solución?}
+          Centraliza la lógica en un producto gobernado, con SLAs de latencia y contratos de calidad de datos.
+        \item \textbf{¿Qué valor generará?}
+          Reducción del 95\% del tiempo de parada preventivo y automatización de la conciliación mensual de pagos.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 5: WHAT (Plantilla UTEC) ---
+\begin{frame}{WHAT -- Qué estamos construyendo?}
+    \textbf{Objetivo: Describir el Data Product como unidad de valor.}
+    \vspace{0.4cm}
+    \begin{itemize}
+        \item \textbf{¿Cuál es el Data Product? ¿Qué representa y para quién?}
+          Portal de alertas y costos de inventario de consignación, consumido por Planeamiento de Mantenimiento y Finanzas.
+        \item \textbf{¿Qué dominio lo produce? ¿Quién lo consume?}
+          Producido por el dominio de Logística y consumido por Finanzas y Abastecimiento.
+        \item \textbf{¿Qué datos incluye y por qué son relevantes?}
+          Alertas de stock de seguridad, montos de reposición en USD y transacciones pre-aprobadas listas para facturar.
+        \item \textbf{¿Qué nivel de disponibilidad y calidad ofrece (SLOs)?}
+          Disponibilidad diaria a primera hora, latencia de consulta $<2.5$ segundos y 100\% de integridad en IDs clave.
+        \item \textbf{¿Cómo se ve el resultado final?}
+          Vistas gobernadas en la capa Gold y un Dashboard interactivo con filtros por proveedor.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 6: HOW (Plantilla UTEC) ---
+\begin{frame}{HOW -- Cómo lo estamos implementando?}
+    \textbf{Objetivo: Mostrar cómo se construye y gobierna el Data Product.}
+    \vspace{0.4cm}
+    \begin{itemize}
+        \item \textbf{¿Cómo se estructuró el pipeline (bronze/silver/gold)?}
+          Bronze (ingesta inmutable y limpieza de nombres) ➡️ Silver (calidad, enmascaramiento UDF y cuarentena) ➡️ Gold (capa semántica de negocio).
+        \item \textbf{¿Se usaron herramientas como Unity Catalog, contratos YAML, validaciones, workflows?}
+          Sí, control de acceso y enmascaramiento dinámico PII en Unity Catalog, validaciones de calidad con contratos YAML y automatización diaria mediante Databricks Workflows.
+        \item \textbf{¿Qué reglas de calidad o clasificación se implementaron?}
+          Desvío automático de registros con cantidad nula, fechas incorrectas o materiales inválidos a Cuarentena.
+        \item \textbf{¿Qué decisiones técnicas y de gobernanza se tomaron?}
+          Uso de `try_cast` para evitar caídas de tareas por datos corruptos de SAP y vistas lógicas estándar en Gold.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 7: WHEN (Plantilla UTEC) ---
+\begin{frame}{WHEN -- Cuál es el estado y próximos pasos?}
+    \textbf{Objetivo: Mostrar el progreso actual y cómo se completará el proyecto.}
+    \vspace{0.4cm}
+    \begin{itemize}
+        \item \textbf{¿Qué ya está hecho (Mínimo viable)?}
+          Pipeline funcional en Databricks de Bronze a Gold y Dashboard interactivo en Databricks Lakeview en producción.
+        \item \textbf{¿Qué falta implementar o validar?}
+          Aprobación final de los catálogos en Unity Catalog por el área central de TI y conectar alertas a Teams.
+        \item \textbf{¿Qué desafíos has identificado y cómo lo abordarás?}
+          Estandarización de las exportaciones de SAP. Lo abordamos con reglas robustas de enmascaramiento y try-casts.
+        \item \textbf{¿Qué plan tienes hasta la entrega final?}
+          Validación del plan del Workflow con el CDO y carga de contratos definitivos en el repositorio GitHub antes del 18 de Julio.
+    \end{itemize}
+\end{frame}
+
+% --- Slide 8: Recomendaciones Finales (Plantilla UTEC) ---
+\begin{frame}{Recomendaciones Finales}
+    \begin{itemize}
+        \setlength{\itemsep}{0.6em}
+        \item \textbf{Enfoque en Valor:} Priorizar siempre la claridad y el valor operativo al negocio por encima de la complejidad técnica de la nube.
+        \item \textbf{Conceptos de Data Mesh:} Adoptar un lenguaje común de dominios, contratos de datos, productos y consumo federado.
+        \item \textbf{Trazabilidad y Calidad:} Mantener la auditoría de SLAs y el control del ciclo de vida del dato mediante contratos YAML.
+        \item \textbf{Hacerlo Simple y Gobernable:} Apoyar el consumo de los Data Products con visualizaciones amigables para el usuario final.
+    \end{itemize}
+    \vspace{0.3cm}
+    \centering
+    \small \textbf{“No se trata de procesar datos. Se trata de crear un producto de datos útil, gobernado y alineado al negocio.”}
+\end{frame}
+
+% --- Slide 9: Cierre (Plantilla UTEC) ---
+{
+\setbeamercolor{background canvas}{bg=UtecDarkGray}
+\begin{frame}[plain]
+    \centering
+    \vspace{2cm}
+    {\Huge \color{UtecCyan} \textbf{¡Gracias!}} \\[0.8cm]
+    \color{white!80}
+    {\large \textbf{Preguntas o comentarios}} \\[1cm]
+    \footnotesize
+    \color{white!60}
+    Curso: Ingeniería de Datos | UTEC Posgrado
+\end{frame}
+}
+
+\end{document}

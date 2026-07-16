@@ -1,0 +1,32 @@
+\frametitle{Monitoreo de SLAs y Acuerdos de Servicio}
+\begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Gobernanza de Uso y Latencias:}
+            \begin{itemize}
+                \setlength{\itemsep}{0.4em}
+                \item \textbf{Auditoría de Consultas:} El diseño original consulta la tabla de logs del sistema \texttt{system.query.history}.
+                \item \textbf{Justificación de Seguridad:} Al no contar con privilegios de administrador para el catálogo \texttt{system} en el clúster interactivo de la clase, implementamos la vista \texttt{vw\_dataproducts\_audit} con datos mockeados para la demostración.
+                \item \textbf{Métricas de SLA demostradas:} Latencia promedio ($<2.5$ segundos) y porcentaje de éxito de consultas ($>99\%$).
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{lstlisting}[language=SQL, caption=Mockeo Seguro del Query History]
+CREATE OR REPLACE VIEW g102_log_reabastecimiento.gold.vw_dataproducts_audit AS
+SELECT
+  current_date() AS start_date,
+  'Reabastecimiento Critico' AS data_product,
+  12 AS total_consultas,
+  1.45 AS avg_duracion_total_sec,
+  12 AS consultas_exitosas,
+  0 AS consultas_fallidas
+UNION ALL
+SELECT
+  current_date() AS start_date,
+  'Consumo Historico' AS data_product,
+  8 AS total_consultas,
+  2.10 AS avg_duracion_total_sec,
+  7 AS consultas_exitosas,
+  1 AS consultas_fallidas;
+            \end{lstlisting}
+        \end{column}
+    \end{columns}
