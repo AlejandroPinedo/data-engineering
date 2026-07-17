@@ -1,0 +1,18 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Introducción y Contexto de Negocio}{2}{section.1}%
+\contentsline {section}{\numberline {2}El Ecosistema de Data Products (Data Mesh)}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Conexiones y Dependencias Semánticas}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Diagrama del Ecosistema de Datos}{3}{subsection.2.2}%
+\contentsline {section}{\numberline {3}Detalle de Procesamiento por Notebook}{4}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Notebook 1: Ingesta Inmutable (Capa Bronze)}{4}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Diagrama de Flujo (Bronze)}{4}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Pseudocódigo (Bronze)}{4}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}Notebook 2: Calidad, Enmascaramiento y Cuarentena (Capa Silver)}{6}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Diagrama de Flujo (Silver)}{6}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}Pseudocódigo (Silver)}{6}{subsubsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.3}Notebook 3: Creación de Vistas (Capa Gold)}{8}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Diagrama de Flujo (Gold)}{8}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2}Pseudocódigo (Gold - SQL)}{8}{subsubsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.4}Notebook 4: Gobernanza, SLAs y Data Contracts}{10}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}Diagrama de Flujo (Gobernanza)}{10}{subsubsection.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2}Pseudocódigo (Gobernanza)}{10}{subsubsection.3.4.2}%

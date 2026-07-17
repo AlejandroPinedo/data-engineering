@@ -11,6 +11,7 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{hyperref}
+\usepackage{colortbl}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds}
 
@@ -24,7 +25,7 @@
     pdfpagemode=FullScreen,
 }
 
-% --- Estilos de Código (listings) ---
+% --- Estilos de Código (listings ajustado para evitar desbordes) ---
 \definecolor{codeblue}{rgb}{0.12, 0.3, 0.6}
 \definecolor{codegreen}{rgb}{0, 0.5, 0}
 \definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
@@ -37,7 +38,7 @@
     keywordstyle=\color{codeblue}\bfseries,
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\small,
+    basicstyle=\ttfamily\footnotesize, % Fuente más pequeña para evitar desbordes
     breakatwhitespace=false,         
     breaklines=true,                 
     captionpos=b,                    
@@ -53,9 +54,9 @@
 
 % --- Estilos de Diagramas TikZ ---
 \tikzset{
-    block/.style={draw, rectangle, rounded corners, fill=blue!10, text width=6cm, align=center, minimum height=1cm, thick},
-    cloud/.style={draw, ellipse, fill=gray!10, text width=4cm, align=center, minimum height=1cm, thick},
-    decision/.style={draw, diamond, aspect=2, fill=orange!10, text width=4cm, align=center, minimum height=1cm, thick},
+    block/.style={draw, rectangle, rounded corners, fill=blue!10, text width=5.5cm, align=center, minimum height=1cm, thick},
+    cloud/.style={draw, ellipse, fill=gray!10, text width=3.8cm, align=center, minimum height=1cm, thick},
+    decision/.style={draw, diamond, aspect=2, fill=orange!10, text width=3.8cm, align=center, minimum height=1cm, thick},
     line/.style={draw, -{Latex[scale=1.2]}, thick},
     arrow/.style={draw, -{Latex[scale=1.2]}, double, thick}
 }
@@ -97,7 +98,7 @@ A continuación se ilustra la topología del Data Mesh implementada:
 
 \begin{figure}[h]
     \centering
-    \begin{tikzpicture}[scale=0.9, every node/.style={scale=0.9}, node distance=1.5cm, auto, >=latex', thick]
+    \begin{tikzpicture}[scale=0.85, every node/.style={scale=0.85}, node distance=1.5cm, auto, >=latex', thick]
         % Capa Silver
         \node[block, fill=blue!15, text width=6cm] (silver) {\textbf{Capa Silver (Esquema Unificado)}\\ \texttt{silver\_movimientos\_consignacion}};
         
@@ -139,7 +140,7 @@ Este notebook realiza la ingesta inmutable de los archivos transaccionales de SA
 \subsubsection{Diagrama de Flujo (Bronze)}
 \begin{figure}[h]
     \centering
-    \begin{tikzpicture}[scale=0.9, every node/.style={scale=0.9}, node distance=1.2cm, auto, >=latex', thick]
+    \begin{tikzpicture}[scale=0.85, every node/.style={scale=0.85}, node distance=1.1cm, auto, >=latex', thick]
         \node[cloud] (start) {Inicio Ingesta};
         \node[block, below=of start] (step1) {Configurar Llaves de ADLS Gen2 en Spark};
         \node[block, below=of step1] (step2) {Leer archivos CSV desde Azure Storage};
@@ -160,25 +161,43 @@ Este notebook realiza la ingesta inmutable de los archivos transaccionales de SA
 \subsubsection{Pseudocódigo (Bronze)}
 \begin{lstlisting}[language=Python]
 # Configuración inicial de acceso
-spark.conf.set("fs.azure.account.key.stdemdsai.dfs.core.windows.net", "STORAGE_KEY")
+spark.conf.set(
+    "fs.azure.account.key.stdemdsai.dfs.core.windows.net", 
+    "STORAGE_KEY"
+)
 
 # Lectura de datos crudos
-df_movimientos_raw = spark.read.csv("abfss://.../raw/airflow/G2/MB51_*.csv", header=True, inferSchema=True)
-df_maestro_raw = spark.read.csv("abfss://.../raw/airflow/G2/maestro_materiales.csv", header=True, inferSchema=True)
+df_movimientos_raw = spark.read.format("csv") \
+    .option("header", "true") \
+    .option("inferSchema", "true") \
+    .load("abfss://.../raw/airflow/G2/MB51_*.csv")
+
+df_maestro_raw = spark.read.format("csv") \
+    .option("header", "true") \
+    .option("inferSchema", "true") \
+    .load("abfss://.../raw/airflow/G2/maestro_materiales.csv")
 
 # Normalización de nombres de columnas
 def clean_column_names(df):
     for col_name in df.columns:
-        clean_name = col_name.strip().replace(" ", "_").replace(".", "_").replace(";", "_")
-        clean_name = clean_name.replace("(", "").replace(")", "")
+        clean_name = col_name.strip() \
+            .replace(" ", "_") \
+            .replace(".", "_") \
+            .replace(";", "_") \
+            .replace("(", "") \
+            .replace(")", "")
         df = df.withColumnRenamed(col_name, clean_name)
     return df
 
 df_movimientos_clean = clean_column_names(df_movimientos_raw)
-df_movimientos_bronze = df_movimientos_clean.withColumn("ingested_at", current_timestamp()).withColumn("file_source_name", col("_metadata.file_path"))
+df_movimientos_bronze = df_movimientos_clean \
+    .withColumn("ingested_at", current_timestamp()) \
+    .withColumn("file_source_name", col("_metadata.file_path"))
 
 # Escritura inmutable
-df_movimientos_bronze.write.format("delta").mode("overwrite").saveAsTable("bronze.bronze_movimientos_sap")
+df_movimientos_bronze.write.format("delta") \
+    .mode("overwrite") \
+    .saveAsTable("g102_log_reabastecimiento.bronze.bronze_movimientos_sap")
 \end{lstlisting}
 
 \newpage
@@ -217,7 +236,8 @@ Este notebook implementa las reglas de negocio de calidad de datos, detecta regi
 \begin{lstlisting}[language=Python]
 # Cargar datos de Bronze
 df_mov = spark.table("bronze.bronze_movimientos_sap")
-df_maestro = spark.table("bronze.bronze_maestro_materiales").drop("ingested_at", "file_source_name")
+df_maestro = spark.table("bronze.bronze_maestro_materiales") \
+    .drop("ingested_at", "file_source_name")
 
 # Formateo y limpieza resiliente (try_cast y try_to_date)
 df_mov_clean = df_mov.withColumn("Posting_Date", coalesce(
@@ -231,17 +251,20 @@ df_mov_clean = df_mov.withColumn("Posting_Date", coalesce(
 df_joined = df_mov_clean.join(df_maestro, df_mov_clean.Material == df_maestro.Material, "left")
 
 # Reglas de desvío a Cuarentena
-condicion_cuarentena = (col("Qty").isNull()) | (col("Qty") == 0) | (col("Proveedor").isNull()) | (col("Posting_Date").isNull())
+condicion_cuarentena = (col("Qty").isNull()) | (col("Qty") == 0) | \
+                       (col("Proveedor").isNull()) | (col("Posting_Date").isNull())
 
 df_cuarentena = df_joined.filter(condicion_cuarentena)
 df_silver_clean = df_joined.filter(~condicion_cuarentena)
 
 # Escribir en Cuarentena
-df_cuarentena.select("Material_Id", "Posting_Date", "Qty", "Storage_Location").write.mode("append").saveAsTable("silver.silver_movimientos_cuarentena")
+df_cuarentena.select("Material_Id", "Posting_Date", "Qty", "Storage_Location") \
+    .write.mode("append").saveAsTable("silver.silver_movimientos_cuarentena")
 
 # Enmascaramiento dinámico PII y selección final
 df_silver_final = df_silver_clean.withColumn("usuario_sap_masked", expr("silver.pii_mask_user(User_Name)"))
-df_silver_final.select("material_id", "descripcion", "proveedor", "cantidad", "costo_unitario_usd", "usuario_sap_masked").write.mode("overwrite").saveAsTable("silver.silver_movimientos_consignacion")
+df_silver_final.select("material_id", "descripcion", "proveedor", "cantidad", "costo_unitario_usd", "usuario_sap_masked") \
+    .write.mode("overwrite").saveAsTable("silver.silver_movimientos_consignacion")
 \end{lstlisting}
 
 \newpage
@@ -251,7 +274,7 @@ Este notebook estructura los datos refinados de la capa Silver en vistas semánt
 \subsubsection{Diagrama de Flujo (Gold)}
 \begin{figure}[h]
     \centering
-    \begin{tikzpicture}[scale=0.9, every node/.style={scale=0.9}, node distance=1.2cm, auto, >=latex', thick]
+    \begin{tikzpicture}[scale=0.85, every node/.style={scale=0.85}, node distance=1.1cm, auto, >=latex', thick]
         \node[cloud] (start) {Inicio Capa Gold};
         \node[block, below=of start] (check) {Verificar existencia de esquemas Gold};
         
@@ -276,9 +299,11 @@ Este notebook estructura los datos refinados de la capa Silver en vistas semánt
 -- 1. DATA PRODUCT 1: ALERTAS DE REABASTECIMIENTO CRÍTICO
 CREATE OR REPLACE VIEW g102_log_reabastecimiento.gold.mv_replenishment_alerts AS
 WITH stock_acumulado AS (
-  SELECT material_id, descripcion, proveedor, categoria, stock_seguridad, punto_reorden, costo_unitario_usd, SUM(cantidad) AS stock_actual
+  SELECT material_id, descripcion, proveedor, categoria, stock_seguridad, 
+         punto_reorden, costo_unitario_usd, SUM(cantidad) AS stock_actual
   FROM g102_log_reabastecimiento.silver.silver_movimientos_consignacion
-  GROUP BY material_id, descripcion, proveedor, categoria, stock_seguridad, punto_reorden, costo_unitario_usd
+  GROUP BY material_id, descripcion, proveedor, categoria, stock_seguridad, 
+           punto_reorden, costo_unitario_usd
 )
 SELECT material_id, descripcion, proveedor, categoria, stock_actual, stock_seguridad, punto_reorden,
   CASE 
@@ -293,11 +318,24 @@ WHERE stock_actual < punto_reorden;
 
 -- 2. DATA PRODUCT 2: CONSUMO MENSUAL Y COSTOS
 CREATE OR REPLACE VIEW g102_log_consumos.gold.mv_consumption_analysis AS
-SELECT date_format(fecha_movimiento, 'yyyy-MM') AS anio_mes, material_id, descripcion, proveedor, categoria,
-  ABS(SUM(cantidad)) AS cantidad_consumida, ABS(SUM(monto_total_usd)) AS costo_consumo_usd
+SELECT date_format(fecha_movimiento, 'yyyy-MM') AS anio_mes, material_id, 
+       descripcion, proveedor, categoria,
+       ABS(SUM(cantidad)) AS cantidad_consumida, 
+       ABS(SUM(monto_total_usd)) AS costo_consumo_usd
 FROM g102_log_reabastecimiento.silver.silver_movimientos_consignacion
 WHERE cantidad < 0
 GROUP BY date_format(fecha_movimiento, 'yyyy-MM'), material_id, descripcion, proveedor, categoria;
+
+-- 3. DATA PRODUCT 3: CONCILIACIÓN MENSUAL DE PAGOS
+CREATE OR REPLACE VIEW g102_fin_conciliacion.gold.mv_monthly_conciliation AS
+SELECT date_format(fecha_movimiento, 'yyyy-MM') AS anio_mes, proveedor, 
+       documento_material, material_id, descripcion, costo_unitario_usd,
+       ABS(SUM(cantidad)) AS cantidad_facturable, 
+       ABS(SUM(monto_total_usd)) AS monto_facturable_usd
+FROM g102_log_reabastecimiento.silver.silver_movimientos_consignacion
+WHERE cantidad < 0
+GROUP BY date_format(fecha_movimiento, 'yyyy-MM'), proveedor, documento_material, 
+         material_id, descripcion, costo_unitario_usd;
 \end{lstlisting}
 
 \newpage
@@ -307,7 +345,7 @@ Este notebook documenta los metadatos en Unity Catalog, estructura el reporte de
 \subsubsection{Diagrama de Flujo (Gobernanza)}
 \begin{figure}[h]
     \centering
-    \begin{tikzpicture}[scale=0.9, every node/.style={scale=0.9}, node distance=1.2cm, auto, >=latex', thick]
+    \begin{tikzpicture}[scale=0.85, every node/.style={scale=0.85}, node distance=1.1cm, auto, >=latex', thick]
         \node[cloud] (start) {Inicio Gobernanza};
         \node[block, below=of start] (step1) {Escribir Comentarios de Columnas (Unity Catalog)};
         \node[block, below=of step1] (step2) {Crear Vista de Auditoría de SLA y Latencias};
@@ -334,8 +372,21 @@ spark.sql("COMMENT ON COLUMN gold.mv_replenishment_alerts.stock_actual IS 'Inven
 # 2. Vista de Auditoría (Mockeada por permisos de system.query.history)
 spark.sql("""
 CREATE OR REPLACE VIEW gold.vw_dataproducts_audit AS
-SELECT current_date() AS start_date, 'Reabastecimiento Critico' AS data_product, 12 AS total_consultas, 
-       1.45 AS avg_duracion_total_sec, 12 AS consultas_exitosas, 0 AS consultas_fallidas
+SELECT 
+  current_date() AS start_date, 
+  'Reabastecimiento Critico' AS data_product, 
+  12 AS total_consultas, 
+  1.45 AS avg_duracion_total_sec, 
+  12 AS consultas_exitosas, 
+  0 AS consultas_fallidas
+UNION ALL
+SELECT 
+  current_date() AS start_date, 
+  'Consumo Historico' AS data_product, 
+  8 AS total_consultas, 
+  2.10 AS avg_duracion_total_sec, 
+  7 AS consultas_exitosas, 
+  1 AS consultas_fallidas
 """)
 
 # 3. Data Contract en YAML
