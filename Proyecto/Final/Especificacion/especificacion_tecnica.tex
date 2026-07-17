@@ -1,0 +1,361 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Paquetes de Formato y Estilo ---
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds}
+
+% --- Configuración de Enlaces ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Especificación Técnica de Data Products - Minera Los Andes},
+    pdfpagemode=FullScreen,
+}
+
+% --- Estilos de Código (listings) ---
+\definecolor{codeblue}{rgb}{0.12, 0.3, 0.6}
+\definecolor{codegreen}{rgb}{0, 0.5, 0}
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+\definecolor{backgroundgray}{rgb}{0.97, 0.97, 0.97}
+
+\lstdefinestyle{pseudostyle}{
+    backgroundcolor=\color{backgroundgray},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=8pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4
+}
+\lstset{style=pseudostyle}
+
+% --- Estilos de Diagramas TikZ ---
+\tikzset{
+    block/.style={draw, rectangle, rounded corners, fill=blue!10, text width=6cm, align=center, minimum height=1cm, thick},
+    cloud/.style={draw, ellipse, fill=gray!10, text width=4cm, align=center, minimum height=1cm, thick},
+    decision/.style={draw, diamond, aspect=2, fill=orange!10, text width=4cm, align=center, minimum height=1cm, thick},
+    line/.style={draw, -{Latex[scale=1.2]}, thick},
+    arrow/.style={draw, -{Latex[scale=1.2]}, double, thick}
+}
+
+% --- Metadatos del Documento ---
+\title{\textbf{Especificación Técnica y Ecosistema de Data Products}\\
+\large Arquitectura Medallion y Data Mesh en la Gestión de Inventarios por Consignación}
+\author{\textbf{Maestría en Ingeniería de Datos} \\ Universidad de Ingeniería y Tecnología - UTEC Posgrado \\ \textbf{Grupo G2 (Sección 1 - g102)}}
+\date{18 de Julio de 2026}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+% -------------------------------------------------------------------
+\section{Introducción y Contexto de Negocio}
+% -------------------------------------------------------------------
+El presente documento describe detalladamente el diseño, la lógica de procesamiento y la arquitectura del pipeline de datos implementado para la \textbf{Compañía Minera Los Andes S.A.}. El objetivo del sistema es automatizar y asegurar el abastecimiento de repuestos críticos bajo el modelo logístico de \textbf{Consignación} en mina (donde el inventario pertenece al proveedor hasta que la minera lo consume en el tajo abierto o planta concentradora).
+
+Para resolver los riesgos de desabastecimiento, optimizar el capital de trabajo y agilizar la facturación mensual, se implementaron \textbf{3 Data Products} en una arquitectura Medallion descentralizada (\textbf{Data Mesh}) utilizando Databricks y Unity Catalog.
+
+\newpage
+% -------------------------------------------------------------------
+\section{El Ecosistema de Data Products (Data Mesh)}
+% -------------------------------------------------------------------
+En un modelo de Data Mesh, los productos de datos no operan de forma aislada. Comparten una capa unificada y se retroalimentan mutuamente para refinar las políticas operativas y contables de la empresa.
+
+\subsection{Conexiones y Dependencias Semánticas}
+\begin{itemize}
+    \item \textbf{Alimentación de Origen:} Los tres Data Products en la capa Gold se alimentan de la tabla unificada enriquecida de la capa Silver (\texttt{silver\_movimientos\_consignacion}).
+    \item \textbf{Ajuste Dinámico de Alertas (DP2 $\rightarrow$ DP1):} El \textbf{DP2 (Análisis de Consumo)} calcula el desgaste mensual real de los materiales. Si se detecta un incremento sostenido en el consumo de una categoría (ej. medios de molienda), Planeamiento de Mantenimiento ajusta al alza el Stock de Seguridad y el Punto de Reorden en el catálogo maestro de materiales. Como resultado, las alertas del \textbf{DP1 (Reabastecimiento)} se adaptan dinámicamente al ritmo de consumo del tajo.
+    \item \textbf{Auditoría de Reconciliación (DP2 $\leftrightarrow$ DP3):} El costo financiero mensual de los retiros reportados en el \textbf{DP2} debe conciliarse centavo a centavo con los documentos de material listos para facturar del \textbf{DP3 (Pagos)}. Finanzas audita que no existan discrepancias entre ambos productos antes de emitir la orden de pago.
+\end{itemize}
+
+\subsection{Diagrama del Ecosistema de Datos}
+A continuación se ilustra la topología del Data Mesh implementada:
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[scale=0.9, every node/.style={scale=0.9}, node distance=1.5cm, auto, >=latex', thick]
+        % Capa Silver
+        \node[block, fill=blue!15, text width=6cm] (silver) {\textbf{Capa Silver (Esquema Unificado)}\\ \texttt{silver\_movimientos\_consignacion}};
+        
+        % Capa Gold (Data Products)
+        \node[block, fill=orange!15, below left=2cm and 2.5cm of silver, text width=4.2cm] (dp1) {\textbf{DP1: Reabastecimiento}\\ \texttt{mv\_replenishment\_alerts}};
+        \node[block, fill=orange!15, below=2cm of silver, text width=4.2cm] (dp2) {\textbf{DP2: Consumo y Costos}\\ \texttt{mv\_consumption\_analysis}};
+        \node[block, fill=orange!15, below right=2cm and 2.5cm of silver, text width=4.2cm] (dp3) {\textbf{DP3: Conciliación de Pagos}\\ \texttt{mv\_monthly\_conciliation}};
+        
+        % Consumidores
+        \node[cloud, below=2cm of dp1, text width=3.5cm] (c1) {Planeamiento de Mantenimiento};
+        \node[cloud, below=2cm of dp2, text width=3.5cm] (c2) {Logística y Contratos};
+        \node[cloud, below=2cm of dp3, text width=3.5cm] (c3) {Finanzas y Contabilidad};
+
+        % Conexiones de datos
+        \draw[line] (silver) -| (dp1);
+        \draw[line] (silver) -- (dp2);
+        \draw[line] (silver) -| (dp3);
+        
+        % Flujos de Consumo
+        \draw[line] (dp1) -- (c1);
+        \draw[line] (dp2) -- (c2);
+        \draw[line] (dp3) -- (c3);
+
+        % Interconexiones semánticas (Líneas punteadas)
+        \draw[line, dashed, draw=red, <->] (dp2) -- node[above, scale=0.7] {Conciliación} (dp3);
+        \draw[line, dashed, draw=blue, ->] (dp2) [bend right=30] to node[above, scale=0.7, align=center] {Ajuste de\\Stock de Seguridad} (dp1);
+    \end{tikzpicture}
+    \caption{Mapa conceptual de Data Mesh y dependencias entre Data Products.}
+\end{figure}
+
+\newpage
+% -------------------------------------------------------------------
+\section{Detalle de Procesamiento por Notebook}
+% -------------------------------------------------------------------
+
+\subsection{Notebook 1: Ingesta Inmutable (Capa Bronze)}
+Este notebook realiza la ingesta inmutable de los archivos transaccionales de SAP y el catálogo maestro de materiales hacia tablas Delta gobernadas en Unity Catalog.
+
+\subsubsection{Diagrama de Flujo (Bronze)}
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[scale=0.9, every node/.style={scale=0.9}, node distance=1.2cm, auto, >=latex', thick]
+        \node[cloud] (start) {Inicio Ingesta};
+        \node[block, below=of start] (step1) {Configurar Llaves de ADLS Gen2 en Spark};
+        \node[block, below=of step1] (step2) {Leer archivos CSV desde Azure Storage};
+        \node[block, below=of step2] (step3) {Añadir timestamp y \texttt{\_metadata.file\_path}};
+        \node[block, below=of step3] (step4) {Normalizar Nombres de Columnas (\texttt{clean\_column\_names})};
+        \node[block, below=of step4] (step5) {Escribir Tablas Delta (Bronze)};
+        \node[cloud, below=of step5] (end) {Fin Capa Bronze};
+
+        \draw[line] (start) -- (step1);
+        \draw[line] (step1) -- (step2);
+        \draw[line] (step2) -- (step3);
+        \draw[line] (step3) -- (step4);
+        \draw[line] (step4) -- (step5);
+        \draw[line] (step5) -- (end);
+    \end{tikzpicture}
+\end{figure}
+
+\subsubsection{Pseudocódigo (Bronze)}
+\begin{lstlisting}[language=Python]
+# Configuración inicial de acceso
+spark.conf.set("fs.azure.account.key.stdemdsai.dfs.core.windows.net", "STORAGE_KEY")
+
+# Lectura de datos crudos
+df_movimientos_raw = spark.read.csv("abfss://.../raw/airflow/G2/MB51_*.csv", header=True, inferSchema=True)
+df_maestro_raw = spark.read.csv("abfss://.../raw/airflow/G2/maestro_materiales.csv", header=True, inferSchema=True)
+
+# Normalización de nombres de columnas
+def clean_column_names(df):
+    for col_name in df.columns:
+        clean_name = col_name.strip().replace(" ", "_").replace(".", "_").replace(";", "_")
+        clean_name = clean_name.replace("(", "").replace(")", "")
+        df = df.withColumnRenamed(col_name, clean_name)
+    return df
+
+df_movimientos_clean = clean_column_names(df_movimientos_raw)
+df_movimientos_bronze = df_movimientos_clean.withColumn("ingested_at", current_timestamp()).withColumn("file_source_name", col("_metadata.file_path"))
+
+# Escritura inmutable
+df_movimientos_bronze.write.format("delta").mode("overwrite").saveAsTable("bronze.bronze_movimientos_sap")
+\end{lstlisting}
+
+\newpage
+\subsection{Notebook 2: Calidad, Enmascaramiento y Cuarentena (Capa Silver)}
+Este notebook implementa las reglas de negocio de calidad de datos, detecta registros corruptos desviándolos a la tabla de cuarentena, y aplica enmascaramiento dinámico a los nombres de usuario (datos PII).
+
+\subsubsection{Diagrama de Flujo (Silver)}
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[scale=0.85, every node/.style={scale=0.85}, node distance=1.1cm, auto, >=latex', thick]
+        \node[cloud] (start) {Inicio Silver};
+        \node[block, below=of start] (read) {Leer tablas Bronze};
+        \node[block, below=of read] (transform) {Aplicar \texttt{try\_to\_date} y \texttt{try\_cast}};
+        \node[block, below=of transform] (join) {Cruce Left Join con Maestro};
+        \node[decision, below=of join] (quality) {¿Cumple reglas de calidad?};
+        
+        \node[block, below right=1cm and 0.5cm of quality, text width=5.5cm, fill=red!10] (quarantine) {Desviar a \texttt{silver\_movimientos\_cuarentena}};
+        \node[block, below left=1cm and 0.5cm of quality, text width=5.5cm, fill=green!10] (clean) {Enmascarar PII con UDF e identificar campos finales};
+        
+        \node[block, below=3.5cm of quality] (write) {Escribir Tablas Silver en Unity Catalog};
+        \node[cloud, below=of write] (end) {Fin Capa Silver};
+
+        \draw[line] (start) -- (read);
+        \draw[line] (read) -- (transform);
+        \draw[line] (transform) -- (join);
+        \draw[line] (join) -- (quality);
+        \draw[line] (quality) -| node[above, xshift=1.5cm] {NO} (quarantine);
+        \draw[line] (quality) -| node[above, xshift=-1.5cm] {SÍ} (clean);
+        \draw[line] (quarantine) |- (write);
+        \draw[line] (clean) |- (write);
+        \draw[line] (write) -- (end);
+    \end{tikzpicture}
+\end{figure}
+
+\subsubsection{Pseudocódigo (Silver)}
+\begin{lstlisting}[language=Python]
+# Cargar datos de Bronze
+df_mov = spark.table("bronze.bronze_movimientos_sap")
+df_maestro = spark.table("bronze.bronze_maestro_materiales").drop("ingested_at", "file_source_name")
+
+# Formateo y limpieza resiliente (try_cast y try_to_date)
+df_mov_clean = df_mov.withColumn("Posting_Date", coalesce(
+    expr("try_to_date(Posting_Date, 'yyyy-MM-dd')"),
+    expr("try_to_date(Posting_Date, 'd/M/yyyy')")
+)).withColumn("Qty", expr("try_cast(Quantity AS DOUBLE)")) \
+  .withColumn("Amount_Loc_Cur", expr("try_cast(Amt_in_Loc_Cur_ AS DOUBLE)")) \
+  .filter(col("Special_Stock") == "K")
+
+# Cruce con el maestro de materiales
+df_joined = df_mov_clean.join(df_maestro, df_mov_clean.Material == df_maestro.Material, "left")
+
+# Reglas de desvío a Cuarentena
+condicion_cuarentena = (col("Qty").isNull()) | (col("Qty") == 0) | (col("Proveedor").isNull()) | (col("Posting_Date").isNull())
+
+df_cuarentena = df_joined.filter(condicion_cuarentena)
+df_silver_clean = df_joined.filter(~condicion_cuarentena)
+
+# Escribir en Cuarentena
+df_cuarentena.select("Material_Id", "Posting_Date", "Qty", "Storage_Location").write.mode("append").saveAsTable("silver.silver_movimientos_cuarentena")
+
+# Enmascaramiento dinámico PII y selección final
+df_silver_final = df_silver_clean.withColumn("usuario_sap_masked", expr("silver.pii_mask_user(User_Name)"))
+df_silver_final.select("material_id", "descripcion", "proveedor", "cantidad", "costo_unitario_usd", "usuario_sap_masked").write.mode("overwrite").saveAsTable("silver.silver_movimientos_consignacion")
+\end{lstlisting}
+
+\newpage
+\subsection{Notebook 3: Creación de Vistas (Capa Gold)}
+Este notebook estructura los datos refinados de la capa Silver en vistas semánticas orientadas al negocio que definen a los 3 Data Products.
+
+\subsubsection{Diagrama de Flujo (Gold)}
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[scale=0.9, every node/.style={scale=0.9}, node distance=1.2cm, auto, >=latex', thick]
+        \node[cloud] (start) {Inicio Capa Gold};
+        \node[block, below=of start] (check) {Verificar existencia de esquemas Gold};
+        
+        \node[block, below=of check, text width=7.5cm, fill=orange!10] (dp1) {DP1: Alertas de Inventario bajo Stock de Seguridad};
+        \node[block, below=of dp1, text width=7.5cm, fill=orange!10] (dp2) {DP2: Análisis de Costo Acumulado de Consumos};
+        \node[block, below=of dp2, text width=7.5cm, fill=orange!10] (dp3) {DP3: Conciliación de Facturación Mensual};
+        
+        \node[block, below=of dp3] (write) {Crear Vistas lógicas en los catálogos correspondientes};
+        \node[cloud, below=of write] (end) {Fin Capa Gold};
+
+        \draw[line] (start) -- (check);
+        \draw[line] (check) -- (dp1);
+        \draw[line] (dp1) -- (dp2);
+        \draw[line] (dp2) -- (dp3);
+        \draw[line] (dp3) -- (write);
+        \draw[line] (write) -- (end);
+    \end{tikzpicture}
+\end{figure}
+
+\subsubsection{Pseudocódigo (Gold - SQL)}
+\begin{lstlisting}[language=SQL]
+-- 1. DATA PRODUCT 1: ALERTAS DE REABASTECIMIENTO CRÍTICO
+CREATE OR REPLACE VIEW g102_log_reabastecimiento.gold.mv_replenishment_alerts AS
+WITH stock_acumulado AS (
+  SELECT material_id, descripcion, proveedor, categoria, stock_seguridad, punto_reorden, costo_unitario_usd, SUM(cantidad) AS stock_actual
+  FROM g102_log_reabastecimiento.silver.silver_movimientos_consignacion
+  GROUP BY material_id, descripcion, proveedor, categoria, stock_seguridad, punto_reorden, costo_unitario_usd
+)
+SELECT material_id, descripcion, proveedor, categoria, stock_actual, stock_seguridad, punto_reorden,
+  CASE 
+    WHEN stock_actual < stock_seguridad THEN 'CRITICO - DESABASTECIMIENTO'
+    WHEN stock_actual < punto_reorden THEN 'REORDEN SUGERIDO'
+    ELSE 'NORMAL'
+  END AS estado_inventario,
+  (punto_reorden - stock_actual) AS cantidad_a_comprar,
+  ((punto_reorden - stock_actual) * costo_unitario_usd) AS costo_reposicion_usd
+FROM stock_acumulado
+WHERE stock_actual < punto_reorden;
+
+-- 2. DATA PRODUCT 2: CONSUMO MENSUAL Y COSTOS
+CREATE OR REPLACE VIEW g102_log_consumos.gold.mv_consumption_analysis AS
+SELECT date_format(fecha_movimiento, 'yyyy-MM') AS anio_mes, material_id, descripcion, proveedor, categoria,
+  ABS(SUM(cantidad)) AS cantidad_consumida, ABS(SUM(monto_total_usd)) AS costo_consumo_usd
+FROM g102_log_reabastecimiento.silver.silver_movimientos_consignacion
+WHERE cantidad < 0
+GROUP BY date_format(fecha_movimiento, 'yyyy-MM'), material_id, descripcion, proveedor, categoria;
+\end{lstlisting}
+
+\newpage
+\subsection{Notebook 4: Gobernanza, SLAs y Data Contracts}
+Este notebook documenta los metadatos en Unity Catalog, estructura el reporte de monitoreo de SLAs de desempeño y compila el archivo YAML de contrato de datos para el Data Product.
+
+\subsubsection{Diagrama de Flujo (Gobernanza)}
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[scale=0.9, every node/.style={scale=0.9}, node distance=1.2cm, auto, >=latex', thick]
+        \node[cloud] (start) {Inicio Gobernanza};
+        \node[block, below=of start] (step1) {Escribir Comentarios de Columnas (Unity Catalog)};
+        \node[block, below=of step1] (step2) {Crear Vista de Auditoría de SLA y Latencias};
+        \node[block, below=of step2] (step3) {Leer esquema de Gold en Python};
+        \node[block, below=of step3] (step4) {Construir Diccionario YAML y Expectativas de Calidad};
+        \node[block, below=of step4] (step5) {Imprimir YAML del Contrato de Datos};
+        \node[cloud, below=of step5] (end) {Fin de Pipeline};
+
+        \draw[line] (start) -- (step1);
+        \draw[line] (step1) -- (step2);
+        \draw[line] (step2) -- (step3);
+        \draw[line] (step3) -- (step4);
+        \draw[line] (step4) -- (step5);
+        \draw[line] (step5) -- (end);
+    \end{tikzpicture}
+\end{figure}
+
+\subsubsection{Pseudocódigo (Gobernanza)}
+\begin{lstlisting}[language=Python]
+# 1. Comentarios de Columnas en SQL
+spark.sql("COMMENT ON COLUMN gold.mv_replenishment_alerts.material_id IS 'Codigo de material de SAP'")
+spark.sql("COMMENT ON COLUMN gold.mv_replenishment_alerts.stock_actual IS 'Inventario actual neto acumulado'")
+
+# 2. Vista de Auditoría (Mockeada por permisos de system.query.history)
+spark.sql("""
+CREATE OR REPLACE VIEW gold.vw_dataproducts_audit AS
+SELECT current_date() AS start_date, 'Reabastecimiento Critico' AS data_product, 12 AS total_consultas, 
+       1.45 AS avg_duracion_total_sec, 12 AS consultas_exitosas, 0 AS consultas_fallidas
+""")
+
+# 3. Data Contract en YAML
+df_gold = spark.table("gold.mv_replenishment_alerts")
+contract = {
+    "data_product": "reabastecimiento",
+    "domain": "logistica",
+    "schema": [],
+    "expectations": {
+        "freshness": "updated_daily",
+        "quality": [{"rule": "material_id IS NOT NULL", "level": "error"}]
+    }
+}
+for field in df_gold.schema.fields:
+    contract["schema"].append({
+        "name": field.name,
+        "type": field.dataType.simpleString(),
+        "description": field.metadata.get("comment", "")
+    })
+print(yaml.dump(contract))
+\end{lstlisting}
+
+\end{document}
