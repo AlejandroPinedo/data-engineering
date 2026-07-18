@@ -13,6 +13,10 @@
 \usepackage{colortbl}
 \usepackage{hyperref}
 \usepackage{enumitem}
+
+% Desactivar completamente el guionado (corte de palabras con guion medio) en el documento
+\usepackage[none]{hyphenat}
+
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds}
 
@@ -53,7 +57,7 @@
 }
 \lstset{style=reportstyle}
 
-% --- Estilos de Diagramas TikZ (Mejorado con paleta moderna UTEC/Databricks) ---
+% --- Estilos de Diagramas TikZ ---
 \tikzset{
     storage/.style={draw=gray!80, cylinder, fill=gray!10, text width=3.8cm, align=center, minimum height=1cm, thick},
     layer/.style={draw=blue!80, rectangle, rounded corners=3pt, fill=blue!5, text width=4.5cm, align=center, minimum height=0.9cm, thick},
@@ -109,7 +113,7 @@ La arquitectura de Data Products descentralizados aporta los siguientes benefici
 El pipeline procesa dos conjuntos de datos:
 \begin{enumerate}
     \item \textbf{Registro de Movimientos de SAP (MB51):} Archivos diarios en formato CSV exportados automáticamente desde el ERP SAP local de la mina. Contiene variables como \texttt{Material}, \texttt{Posting\_Date}, \texttt{Quantity}, \texttt{Amt\_in\_Loc\_Cur\_}, \texttt{Movement\_Type}, \texttt{Special\_Stock}, \texttt{Storage\_Location} y \texttt{User\_Name}.
-    \item \textbf{Catálogo Maestro de Materiales:} Archivo CSV mantenido por planeamiento que contiene los metadatos de los repuestos: ID de material, descripción técnica, proveedor dueño, costo unitario en USD, categoría, stock de seguridad y punto de reorden.
+    \item \textbf{Catálogo Maestro de Materiales:} Archivo CSV de planeamiento con los metadatos de los repuestos: ID de material, descripción técnica, proveedor dueño, costo unitario en USD, categoría, stock de seguridad y punto de reorden.
 \end{enumerate}
 
 \newpage
