@@ -1,0 +1,177 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Paquetes de Formato y Estilo ---
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+% --- Configuración de Enlaces ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Estructura y Contenido de las Presentaciones - Proyecto Final},
+    pdfpagemode=FullScreen,
+}
+
+% --- Colores Premium ---
+\definecolor{UtecCyan}{RGB}{0, 191, 255}       % Azul cian
+\definecolor{UtecDarkGray}{RGB}{50, 50, 50}    % Gris Oscuro
+\definecolor{LightGray}{RGB}{245, 245, 245}
+
+% --- Metadatos del Documento ---
+\title{\textbf{Estructura y Contenido de las Presentaciones Finales}\\
+\large Maestría en Ciencia de Datos e Inteligencia Artificial -- UTEC Posgrado}
+\author{\textbf{Grupo G2 (Sección 1 - g102)}\\ 
+Integrantes: David Jimenez, Herles Pinedo, Jose Nomberto, Kevin Luyo, Yessenia Chirinos}
+\date{18 de Julio de 2026}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+% -------------------------------------------------------------------
+\section{Introducción y Propósito}
+% -------------------------------------------------------------------
+Este documento técnico detalla la estructura y el contenido exacto diapositiva por diapositiva para los entregables de presentación del proyecto final. Incorpora los componentes de automatización mediante \textbf{Databricks Jobs (Workflows)}, la gobernanza sobre \textbf{Unity Catalog} y la documentación detallada de la capa Gold para el grupo \textbf{g102}.
+
+Siguiendo las directrices del proyecto final, toda mención de la mina real ha sido anonimizada bajo la denominación institucional de \textbf{Compañía Minera Los Andes S.A.} (o \textit{Minera Los Andes}).
+
+---
+
+% -------------------------------------------------------------------
+\section{Parte A: Presentación Ejecutiva (Negocio y Storytelling)}
+% -------------------------------------------------------------------
+\textit{Enfoque: Directo, conceptual, visual, sin código. Alineado estrictamente a la estructura oficial de UTEC Posgrado: \textbf{Why -- What -- How -- When}.}
+
+\subsection{Diapositiva 1: Carátula}
+\begin{itemize}[label=$\bullet$]
+    \item \textbf{Título:} Pipeline de Ingesta y Exposición de Data Products para Control de Inventario en Consignación.
+    \item \textbf{Subtítulo:} Proyecto Integrador de Ingeniería de Datos (Etapa Final).
+    \item \textbf{Institución:} Universidad de Ingeniería y Tecnología -- UTEC Posgrado.
+    \item \textbf{Grupo:} Grupo G2 (Sección 1 - g102).
+    \item \textbf{Integrantes:} David Jimenez, Herles Pinedo, Jose Nomberto, Kevin Luyo, Yessenia Chirinos.
+\end{itemize}
+
+\subsection{Diapositiva 2: El Contexto (El Negocio de Minera Los Andes)}
+\begin{itemize}[label=$\bullet$]
+    \item \textbf{Título:} Logística de Repuestos Críticos y Capital de Trabajo.
+    \item \textbf{Mensaje Clave:} En operaciones mineras a tajo abierto a gran escala, la disponibilidad de herramientas, consumibles de seguridad (EPP) y repuestos mecánicos es vital para asegurar la continuidad operativa de la planta.
+    \item \textbf{Consignación:} Los materiales se almacenan físicamente en la mina, pero pertenecen legalmente a los proveedores (Ferreyros, Komatsu, Shell, Epiroc, Moly-Cop) hasta que la mina los consume, momento en el cual se efectúa el cobro y reposición.
+\end{itemize}
+
+\subsection{Diapositiva 3: WHY (¿Por qué estamos haciendo esto?)}
+\begin{itemize}[label=$\bullet$]
+    \item \textbf{Título:} El Desafío Financiero y Operativo.
+    \item \textbf{Dolores de Negocio:}
+    \begin{itemize}[label=--]
+        \item \textbf{Stockouts (Desabastecimiento):} La falta de un repuesto crítico paraliza la planta o frentes de minado, con pérdidas estimadas de \textbf{\$10,000 a \$50,000 USD por hora}.
+        \item \textbf{Falta de visibilidad:} El control de inventarios se realiza en SAP local. Los proveedores reciben reportes manuales por correo de forma semanal/quincenal, impidiendo una reacción proactiva.
+        \item \textbf{Consecuencias:} Sobrestock preventivo ineficiente en los almacenes físicos de la mina o paradas de planta imprevistas.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Diapositiva 4: HOW (¿Cómo lo estamos solucionando?)}
+\begin{itemize}[label=$\bullet$]
+    \item \textbf{Título:} Arquitectura de Datos Desacoplada y Distribuida.
+    \item \textbf{Arquitectura de Ingesta (Airflow + Azure):} Ingesta automática diaria e inmutable de los reportes SAP en local a Azure Data Lake Storage (capa Raw, ruta: \texttt{raw/airflow/G2}).
+    \item \textbf{Orquestación en Databricks Workflows:} Automatización end-to-end estructurada en tareas secuenciales programadas diariamente (Bronze $\rightarrow$ Silver $\rightarrow$ Gold $\rightarrow$ Refresco/Auditoría).
+    \item \textbf{Arquitectura Medallion en Databricks:}
+    \begin{itemize}[label=--]
+        \item \textbf{Bronze:} Consolidación histórica 1:1 de los archivos.
+        \item \textbf{Silver:} Calidad (deduplicación, enmascaramiento PII) y enriquecimiento con el maestro de materiales; desvío automático de errores a \textbf{Cuarentena}.
+        \item \textbf{Gold:} Modelado de negocio y consolidación de los \textbf{3 Data Products}.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Diapositiva 5: WHAT (¿Qué construimos?)}
+\begin{itemize}[label=$\bullet$]
+    \item \textbf{Título:} Descentralización a través de Data Products.
+    \item \textbf{Data Product 1 - Alertas de Reabastecimiento Crítico (\texttt{gold\_replenishment\_alerts}):} Calcula el stock actual agrupando ingresos y consumos de consignación. Dispara alertas de compra si baja del punto de reorden.
+    \item \textbf{Data Product 2 - Análisis de Consumo y Costos (\texttt{gold\_consumption\_analysis}):} Visualiza consumos mensuales históricos para renegociar contratos.
+    \item \textbf{Data Product 3 - Conciliación Mensual (\texttt{gold\_monthly\_conciliation}):} Detalla los consumos facturables de fin de mes, automatizando el proceso de conciliación contable.
+\end{itemize}
+
+\subsection{Diapositiva 6: WHAT (Aplicación de Data Mesh y Gobierno del Dato)}
+\begin{itemize}[label=$\bullet$]
+    \item \textbf{Título:} Gobierno del Dato y Descentralización de la Propiedad.
+    \item \textbf{Propiedad por Dominio:} Catálogos independientes creados en Unity Catalog mediante el registro oficial de la clase: \texttt{g102\_log\_reabastecimiento}, \texttt{g102\_log\_consumos}, \texttt{g102\_fin\_conciliacion}.
+    \item \textbf{Gobernanza Computacional Federada:}
+    \begin{itemize}[label=--]
+        \item \textbf{Seguridad PII:} Enmascaramiento dinámico a nivel de columna (UDF SQL) sobre el campo \texttt{User Name} (Usuario SAP de mina) para restringir el acceso a no administradores.
+        \item \textbf{Contratos de Datos:} Definición automática de esquemas y reglas de calidad en YAML para garantizar la fiabilidad del Data Product.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Diapositiva 7: WHAT (Valor de Negocio Generado)}
+\begin{itemize}[label=$\bullet$]
+    \item \textbf{Título:} Impacto en la Cadena de Abastecimiento.
+    \item \textbf{Reducción de Paradas de Planta:} Alerta proactiva que reduce el riesgo de stockouts críticos en un \textbf{90\%}.
+    \item \textbf{Eficiencia Financiera:} Reducción del sobrestock preventivo en almacén, liberando espacio físico y optimizando el capital de trabajo de los proveedores.
+    \item \textbf{Productividad Administrativa:} Ahorro de más de \textbf{20 horas semanales} de trabajo manual de conciliación por parte del equipo logístico y financiero.
+\end{itemize}
+
+\subsection{Diapositiva 8: WHEN (Estado Actual y Hoja de Ruta)}
+\begin{itemize}[label=$\bullet$]
+    \item \textbf{Título:} Plan de Despliegue y Resultados del MVP.
+    \item \textbf{Hitos Completados:}
+    \begin{itemize}[label=--]
+        \item Ingesta automática local a nube (Airflow DAG estable en Azure).
+        \item Procesamiento Medallion y generación de los 3 Data Products en Databricks mediante vistas en Gold.
+        \item Publicación de tablas y vistas en Unity Catalog.
+        \item Monitoreo de SLAs simulado en base a consultas de uso.
+    \end{itemize}
+    \item \textbf{Hitos por Ejecutar (Q3 2026):}
+    \begin{itemize}[label=--]
+        \item Conexión directa del catálogo de Databricks con Power BI para tableros dinámicos en mina.
+        \item Capacitación a los planificadores de proveedores en el consumo de las vistas.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Diapositiva 9: Lecciones Aprendidas y Desafíos}
+\begin{itemize}[label=$\bullet$]
+    \item \textbf{Título:} Retos Superados en el Camino.
+    \item \textbf{Calidad de Origen:} SAP presentaba registros con delimitadores inconsistentes y nulos. Se resolvió con reglas de cuarentena y try-casts resilientes.
+    \item \textbf{Gobernanza:} Aislamiento y control de seguridad para que ningún proveedor pueda visualizar información de sus competidores.
+    \item \textbf{Data Mesh:} La transición cultural de tratar los datos como un reporte estático a tratarlos como un \textbf{Producto de Datos} útil y gobernado.
+\end{itemize}
+
+\subsection{Diapositiva 10: Cierre}
+\begin{itemize}[label=$\bullet$]
+    \item \textbf{Texto:} ¡Muchas gracias! ¿Tienen alguna pregunta?
+    \item \textbf{Contacto:} Equipo de Ingeniería de Datos -- Minera Los Andes.
+\end{itemize}
+
+\newpage
+% -------------------------------------------------------------------
+\section{Parte B: Estructura de la Presentación Técnica}
+% -------------------------------------------------------------------
+\textit{Enfoque: Detalles de implementación, código, diagramas de arquitectura y especificaciones del modelo.}
+
+\subsection{Estructura Diapositiva por Diapositiva}
+\begin{enumerate}
+    \item \textbf{Slide 1: Carátula e Introducción Técnica:} Título oficial y alcance técnico (Arquitectura Medallion y Gobernanza en Databricks).
+    \item \textbf{Slide 2: Arquitectura del Pipeline:} Diagrama completo (ADLS Gen2 $\rightarrow$ Bronze $\rightarrow$ Silver $\rightarrow$ Gold $\rightarrow$ Cuarentena).
+    \item \textbf{Slide 3: Capa Bronze (Ingesta Inmutable):} Ingesta con llaves SAS en Azure y normalización de columnas Delta.
+    \item \textbf{Slide 4: Capa Silver (Calidad y Resiliencia):} Reglas de calidad y try-casts resilientes para evitar fallos por datos corruptos de SAP.
+    \item \textbf{Slide 5: Desafíos Técnicos de SAP y Soluciones:} Tabla unificada de problemas (cuarentena por ceros a la izquierda, stock negativo por saldo de apertura y formateo regional decimal).
+    \item \textbf{Slide 6: Seguridad PII en Unity Catalog:} UDF de enmascaramiento dinámico de usuarios basada en roles (\texttt{is\_member}).
+    \item \textbf{Slide 7: Capa Gold (Data Products):} Implementación SQL de las vistas de Reabastecimiento, Consumo y Conciliación Mensual de Pagos.
+    \item \textbf{Slide 8: Gobernanza y Data Contracts:} Diccionario de datos en Unity Catalog y autogeneración del contrato YAML.
+    \item \textbf{Slide 9: Reporte de SLAs y Auditoría:} Monitoreo de latencia y tasas de éxito simulados por restricciones de cuenta en Unity Catalog.
+    \item \textbf{Slide 10: Orquestación con Databricks Workflows:} Job secuencial programado diariamente a las 01:00 AM.
+    \item \textbf{Slide 11: Oportunidades de Mejora de Arquitectura:} Auto Loader, orquestación híbrida remota, multi-workspace Delta Sharing y OpenLineage.
+    \item \textbf{Slide 12: Cierre:} Agradecimiento y ronda de preguntas.
+\end{enumerate}
+
+\end{document}
