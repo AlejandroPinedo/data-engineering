@@ -1,0 +1,414 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+
+% --- Paquetes Básicos ---
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds}
+
+% --- Configuración de listings para Código (Ajustado para Beamer) ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{sparkcode}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\fontsize{5.2pt}{6.5pt}\selectfont, % Súper compacto para Beamer
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=4pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=sparkcode}
+
+% --- Tema y Colores Premium UTEC Posgrado ---
+\usetheme{Madrid}
+\usecolortheme{whale}
+
+\definecolor{UtecCyan}{RGB}{0, 191, 255}       % Azul cian brillante
+\definecolor{UtecDarkGray}{RGB}{50, 50, 50}    % Gris Oscuro
+\definecolor{LightGray}{RGB}{245, 245, 245}
+
+\setbeamercolor{palette primary}{bg=UtecDarkGray, fg=white}
+\setbeamercolor{palette secondary}{bg=UtecDarkGray!85, fg=white}
+\setbeamercolor{palette tertiary}{bg=UtecCyan, fg=UtecDarkGray}
+\setbeamercolor{titlelike}{parent=palette primary, fg=UtecDarkGray}
+\setbeamercolor{structure}{fg=UtecCyan}
+\setbeamercolor{normal text}{fg=black}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+% --- Metadatos ---
+\title[Sustentación de Arquitectura de Datos]{INGENIERÍA DE DATOS - SUSTENTACIÓN TÉCNICA}
+\subtitle{Arquitectura Medallion Resiliente, Data Mesh y Gobierno en la Nube}
+\author[Grupo G2]{Integrantes: \\ \textbf{Grupo G2 (Sección 1 - g102)}}
+\institute[UTEC]{Universidad de Ingeniería y Tecnología - UTEC Posgrado}
+\date{18 de Julio de 2026}
+
+\begin{document}
+
+% --- Slide 1: Portada ---
+{
+\setbeamercolor{background canvas}{bg=UtecDarkGray}
+\begin{frame}[plain]
+    \centering
+    \vspace{1.2cm}
+    {\large \color{UtecCyan} \textbf{UTEC POSGRADO -- EXAMEN FINAL}} \\[0.2cm]
+    {\LARGE \color{white} \textbf{Defensa Técnica de Arquitectura y Gobernanza}} \\[0.4cm]
+    {\Large \color{UtecCyan} \textbf{Pipeline Medallion Resiliente y Descentralizado}} \\[0.8cm]
+    \color{white}
+    \footnotesize
+    Compañía Minera Los Andes S.A. | Casos de Inventario en Consignación \\
+    Grupo G2 (Sección 1 - g102) \\
+    Julio 2026
+\end{frame}
+}
+
+% --- Slide 2: Arquitectura del Pipeline (TikZ) ---
+\begin{frame}{Arquitectura Técnica del Pipeline}
+    \centering
+    \begin{tikzpicture}[scale=0.75, every node/.style={scale=0.75}, node distance=1.1cm, auto, >=latex', thick]
+        % Capas Medallion
+        \node[draw, cylinder, fill=LightGray, text=UtecDarkGray, align=center] (raw) {ADLS Gen2 Raw\\(CSV SAP / Maestro)};
+        \node[draw, rectangle, rounded corners, fill=UtecDarkGray, text=white, right=1.2cm of raw, align=center, text width=2.2cm] (bronze) {\textbf{Capa Bronze}\\Inmutable Delta};
+        \node[draw, rectangle, rounded corners, fill=UtecDarkGray, text=white, right=1.2cm of bronze, align=center, text width=2.2cm] (silver) {\textbf{Capa Silver}\\Limpieza/Enmascarado};
+        \node[draw, rectangle, rounded corners, fill=UtecDarkGray, text=white, right=1.2cm of silver, align=center, text width=2.2cm] (gold) {\textbf{Capa Gold}\\3 Data Products};
+        
+        \node[draw, rectangle, fill=red!15, text=red, below=0.8cm of silver, align=center] (quarantine) {Cuarentena Delta\\(Registros Errantes)};
+        
+        % Flechas de Flujo
+        \draw[->, double, draw=UtecDarkGray] (raw) -- node[above, scale=0.6]{abfss / SSL} (bronze);
+        \draw[->, draw=UtecDarkGray] (bronze) -- node[above, scale=0.6]{try\_cast / join} (silver);
+        \draw[->, draw=red, dashed] (silver) -- node[left, scale=0.6]{Rechazos} (quarantine);
+        \draw[->, draw=UtecDarkGray] (silver) -- node[above, scale=0.6]{SQL Views} (gold);
+    \end{tikzpicture}
+    \vspace{0.2cm}
+    \small
+    Estructura de almacenamiento distribuido sobre \textbf{Delta Lake} y controlada por políticas de \textbf{Unity Catalog}.
+\end{frame}
+
+% --- Slide 3: Capa Bronze ---
+\begin{frame}[fragile]{Capa Bronze: Ingesta Inmutable y Normalización}
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \textbf{Notebook 1 - Bronze:}
+            \begin{itemize}
+                \setlength{\itemsep}{0.3em}
+                \item \textbf{Ingesta Inmutable:} Carga los archivos CSV de SAP tal como vienen desde el Storage de Azure.
+                \item \textbf{Normalización Delta:} Convierte caracteres especiales, espacios y puntos de SAP a guiones bajos para prevenir excepciones.
+                \item \textbf{Delimitador SAP:} Configuración del lector con delimitador ``;`` o ``,`` para evitar desalineación de columnas en Spark.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{lstlisting}[language=Python, caption=Carga y Normalización en Bronze]
+# Lectura de datos en Bronze
+df_movimientos_raw = spark.read.format("csv") \
+    .option("header", "true") \
+    .option("delimiter", ";") \
+    .option("inferSchema", "true") \
+    .load("abfss://.../raw/airflow/G2/MB51_*.csv")
+
+# Estandarizar nombres de columnas para Delta Lake
+def clean_column_names(df):
+    for col in df.columns:
+        clean = col.strip().replace(" ", "_").replace(".", "_")
+        df = df.withColumnRenamed(col, clean)
+    return df
+
+df_bronze = clean_column_names(df_movimientos_raw) \
+    .withColumn("ingested_at", current_timestamp())
+            \end{lstlisting}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide 4: Capa Silver ---
+\begin{frame}[fragile]{Capa Silver: Resiliencia y Reglas de Calidad}
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \textbf{Notebook 2 - Silver:}
+            \begin{itemize}
+                \setlength{\itemsep}{0.3em}
+                \item \textbf{Tolerancia a Fechas:} Intento de casteo a múltiples formatos de SAP (ISO y local regional) mediante \texttt{coalesce}.
+                \item \textbf{Casteo Numérico Resiliente:} Uso de \texttt{try\_cast} para evitar excepciones por registros desalineados.
+                \item \textbf{Control de Signos de Movimiento:} Estandarización de cantidades (positivo para entradas 101/511, negativo para consumos 201/261).
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{lstlisting}[language=Python, caption=Tratamiento de Signos y Fechas]
+# Parsing tolerante de fechas y casting
+df_clean = df_bronze.withColumn("Posting_Date", coalesce(
+    expr("try_to_date(Posting_Date, 'yyyy-MM-dd')"),
+    expr("try_to_date(Posting_Date, 'd/M/yyyy')")
+)).withColumn("Qty", expr("try_cast(Quantity AS DOUBLE)"))
+
+# Mapear signo según tipo de movimiento SAP
+df_silver = df_clean.withColumn("cantidad", 
+    when(col("Movement_Type").isin("101", "511"), abs(col("Qty")))
+    .when(col("Movement_Type").isin("201", "261"), -abs(col("Qty")))
+    .otherwise(col("Qty"))
+)
+            \end{lstlisting}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide 5: El Caso de la Cuarentena ---
+\begin{frame}[fragile]{Caso Técnico: Cuarentena de 233.69K Registros}
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \textbf{Diagnóstico de la Falla del Join:}
+            \begin{itemize}
+                \setlength{\itemsep}{0.3em}
+                \item \textbf{El Síntoma:} 233.69K registros caían en la tabla de cuarentena y los Data Products quedaban vacíos.
+                \item \textbf{La Causa:} SAP almacena códigos de material con ceros a la izquierda (ej. `000000000000100243`), mientras que el maestro de materiales los tenía sin ceros (`100243`). El join fallaba, y el campo `Proveedor` era nulo.
+                \item \textbf{La Solución:} Aplicar \texttt{ltrim(col, "0")} en ambas fuentes antes de unir.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{lstlisting}[language=Python, caption=Solución al Join con ltrim]
+from pyspark.sql.functions import ltrim, col
+
+# Estandarizar claves eliminando ceros a la izquierda
+df_mov_clean = df_mov_clean.withColumn(
+    "Material_Join", 
+    ltrim(col("Material"), "0")
+)
+df_maestro_clean = df_maestro.withColumn(
+    "Material_Join", 
+    ltrim(col("Material"), "0")
+)
+
+# Join por clave unificada para evitar proveedor nulo
+df_joined = df_mov_clean.join(
+    df_maestro_clean, 
+    "Material_Join", 
+    "left"
+)
+            \end{lstlisting}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide 6: Diagnóstico de Stock Negativo ---
+\begin{frame}[fragile]{Diagnóstico de Stock Negativo y Solución}
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \textbf{Inferencia de Saldos Iniciales:}
+            \begin{itemize}
+                \setlength{\itemsep}{0.3em}
+                \item \textbf{El Problema:} El pipeline calcula el stock actual de forma acumulativa. Sin una foto de saldos iniciales (saldo de apertura), las salidas iniciales restaban de `0` generando stocks negativos virtuales.
+                \item \textbf{La Solución:} Generar virtualmente los saldos iniciales en Bronze (`Movimiento 561`) al 31 de Mayo, y hacer un \texttt{union} antes del procesamiento en Silver.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{lstlisting}[language=Python, caption=Integración de Saldos Iniciales en Bronze]
+# Crear saldos iniciales de apertura en la víspera
+data_saldos = [
+    ("100243", "2026-05-31", 180.0, 0.0, "561", "K", "ALM1", "SYS_INIT"),
+    ("100244", "2026-05-31", 250.0, 0.0, "561", "K", "ALM1", "SYS_INIT")
+]
+df_saldos = spark.createDataFrame(data_saldos, schema=schema_saldos)
+
+# Unir saldos y movimientos del mes en Silver
+df_total_movimientos = df_movimientos.union(df_saldos_iniciales)
+
+# La suma acumulativa en Gold ahora parte de una base positiva
+            \end{lstlisting}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide 7: Seguridad y Enmascaramiento PII ---
+\begin{frame}[fragile]{Seguridad de Datos PII en Unity Catalog}
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \textbf{Gobernanza de Datos Sensibles:}
+            \begin{itemize}
+                \setlength{\itemsep}{0.3em}
+                \item \textbf{Dato Sensible:} El nombre del operador del almacén de SAP es información confidencial.
+                \item \textbf{UDF por Roles:} Creamos la UDF SQL \texttt{pii\_mask\_user} en Unity Catalog.
+                \item \textbf{Control de Acceso:} Si el usuario consultor no pertenece al grupo de administradores, el motor enmascara dinámicamente el dato en tiempo de ejecución.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{lstlisting}[language=SQL, caption=UDF SQL de Enmascaramiento PII]
+CREATE OR REPLACE FUNCTION g102_log_reabastecimiento.silver.pii_mask_user(col_name STRING)
+RETURNS STRING
+COMMENT 'Enmascara el usuario si no es administrador'
+RETURN SELECT CASE 
+    WHEN is_member('utec-admin') THEN col_name 
+    ELSE mask(col_name) 
+  END AS col_name;
+
+-- Aplicación en la vista de consumo
+-- SELECT pii_mask_user(User_Name) AS usuario_masked ...
+            \end{lstlisting}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide 8: Capa Gold y Data Products ---
+\begin{frame}[fragile]{Capa Gold: Los 3 Data Products}
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \textbf{Modelamiento Semántico:}
+            \begin{itemize}
+                \setlength{\itemsep}{0.3em}
+                \item \textbf{DP1: Reabastecimiento Crítico} (\texttt{mv\_replenishment\_alerts}). Muestra qué comprar basándose en stock actual, stock de seguridad y punto de reorden.
+                \item \textbf{DP2: Análisis de Consumo} (\texttt{mv\_consumption\_analysis}). Costo acumulado agrupado por período y categoría.
+                \item \textbf{DP3: Conciliación de Pagos} (\texttt{mv\_monthly\_conciliation}). Agrupación contable por Documento de Material SAP.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{lstlisting}[language=SQL, caption=Consolidación en Gold (DP3)]
+CREATE OR REPLACE VIEW g102_fin_conciliacion.gold.mv_monthly_conciliation AS
+SELECT 
+  date_format(fecha_movimiento, 'yyyy-MM') AS anio_mes, 
+  proveedor, 
+  documento_material, 
+  material_id, 
+  descripcion, 
+  costo_unitario_usd,
+  ABS(SUM(cantidad)) AS cantidad_facturable,
+  ABS(SUM(monto_total_usd)) AS monto_facturable_usd
+FROM g102_log_reabastecimiento.silver.silver_movimientos_consignacion
+WHERE cantidad < 0
+GROUP BY 1, 2, 3, 4, 5, 6;
+            \end{lstlisting}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide 9: Diccionario de Datos y Data Contracts ---
+\begin{frame}[fragile]{Gobernanza: Diccionario y Data Contracts}
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \textbf{Gobernanza de Producto:}
+            \begin{itemize}
+                \setlength{\itemsep}{0.3em}
+                \item \textbf{Metadatos Integrados:} Definición de columnas inyectada directamente al catálogo con \texttt{COMMENT ON COLUMN} de SQL.
+                \item \textbf{Contratos YAML:} Función en Python que lee el esquema Delta de Gold y autogenera un contrato YAML con las expectativas de frescura y calidad para los consumidores.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{lstlisting}[language=Python, caption=Función Autogeneradora de Contratos]
+# Estructuración de Contrato YAML en Python
+contract = {
+    "data_product": "reabastecimiento",
+    "domain": "logistica",
+    "schema": [],
+    "expectations": {
+        "freshness": "updated_daily",
+        "quality": [{"rule": "material_id IS NOT NULL"}]
+    }
+}
+for field in df_gold.schema.fields:
+    contract["schema"].append({
+        "name": field.name,
+        "type": field.dataType.simpleString(),
+        "description": field.metadata.get("comment", "")
+    })
+            \end{lstlisting}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide 10: Auditoría y SLAs ---
+\begin{frame}[fragile]{Reporte de SLAs del Portal de Datos}
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \textbf{Monitoreo de SLAs de Consulta:}
+            \begin{itemize}
+                \setlength{\itemsep}{0.3em}
+                \item \textbf{Métricas de SLA:} Latencia promedio ($<2.5$ segundos) y porcentaje de éxito de consultas ($>99\%$).
+                \item \textbf{Seguridad de Catálogo:} Al no contar con privilegios en la tabla del sistema \texttt{system.query.history} en la interfaz interactiva, se mockeó el reporte con datos representativos realistas de uso de los Data Products.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{lstlisting}[language=SQL, caption=Estructura de la Vista de Auditoría]
+CREATE OR REPLACE VIEW gold.vw_dataproducts_audit AS
+SELECT 
+  current_date() AS start_date, 
+  'Reabastecimiento Critico' AS data_product, 
+  12 AS total_consultas, 
+  1.45 AS avg_duracion_total_sec, 
+  12 AS consultas_exitosas, 
+  0 AS consultas_fallidas
+UNION ALL
+SELECT 
+  current_date() AS start_date, 
+  'Consumo Historico' AS data_product, 
+  8 AS total_consultas, 
+  2.10 AS avg_duracion_total_sec, 
+  7 AS consultas_exitosas, 
+  1 AS consultas_fallidas;
+            \end{lstlisting}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide 11: Orquestación (Workflows) ---
+\begin{frame}{Orquestación de Pipelines (Databricks Workflows)}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Topología del Job:}
+            \begin{itemize}
+                \setlength{\itemsep}{0.4em}
+                \item \textbf{Secuenciación de Tareas:} Bronze $\rightarrow$ Silver $\rightarrow$ Gold $\rightarrow$ Gobernanza.
+                \item \textbf{Programación (Trigger):} Ejecución diaria automatizada a las **01:00 AM** (Lima).
+                \item \textbf{Alertas de Fallo:} Envío de notificaciones por correo automatizadas en caso de caída de tareas.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \centering
+            \begin{beamercolorbox}[shadow=true,rounded=true,wd=\textwidth]{palette secondary}
+                \centering \textbf{Flujo del Workflow}
+            \end{beamercolorbox}
+            \vspace{0.4cm}
+            \small
+            \begin{tikzpicture}[scale=0.75, every node/.style={scale=0.75}, node distance=1.1cm, >=latex', thick]
+                \node[draw, rectangle, fill=LightGray, align=center, text width=4.5cm] (t1) {Task 1: Ingesta Bronze};
+                \node[draw, rectangle, fill=LightGray, align=center, text width=4.5cm, below=0.6cm of t1] (t2) {Task 2: Procesamiento Silver};
+                \node[draw, rectangle, fill=LightGray, align=center, text width=4.5cm, below=0.6cm of t2] (t3) {Task 3: Vistas Gold};
+                \node[draw, rectangle, fill=LightGray, align=center, text width=4.5cm, below=0.6cm of t3] (t4) {Task 4: Gobernanza / YAML};
+                
+                \draw[->, draw=UtecDarkGray] (t1) -- (t2);
+                \draw[->, draw=UtecDarkGray] (t2) -- (t3);
+                \draw[->, draw=UtecDarkGray] (t3) -- (t4);
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Slide 12: Cierre ---
+{
+\setbeamercolor{background canvas}{bg=UtecDarkGray}
+\begin{frame}[plain]
+    \centering
+    \vspace{1.5cm}
+    {\Huge \color{UtecCyan} \textbf{Gracias}} \\[0.8cm]
+    {\large \color{white} \textbf{¿Preguntas sobre el pipeline técnico?}} \\[1cm]
+    \footnotesize
+    \color{white!70}
+    Grupo G2 (Sección 1 - g102) | Maestría en Ingeniería de Datos - UTEC
+\end{frame}
+}
+
+\end{document}

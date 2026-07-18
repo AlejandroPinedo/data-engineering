@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1784181086.79848 "/Users/herivera/Documents/MAESTRIA/Data Engineering/Proyecto/Final/Tecnica/presentacion_tecnica.tex" "presentacion_tecnica.pdf" "presentacion_tecnica" 1784181088.22654 2
-  "/Users/herivera/Documents/MAESTRIA/Data Engineering/Proyecto/Final/Tecnica/presentacion_tecnica.tex" 1784181068.52673 15903 7600df4bfbc3a35f933ed931c1d1eb56 ""
+["pdflatex"] 1784389611.34299 "/Users/herivera/Documents/MAESTRIA/Data Engineering/Proyecto/Final/Diapositiva Tecnica/presentacion_tecnica.tex" "presentacion_tecnica.pdf" "presentacion_tecnica" 1784389612.68591 2
+  "/Users/herivera/Documents/MAESTRIA/Data Engineering/Proyecto/Final/Diapositiva Tecnica/presentacion_tecnica.tex" 1784389609.63218 15910 08e534fd6b6f235e6e72865bc2db35d5 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm" 1246382020 916 f87d7c45f9c908e672703b83b72241a3 ""
@@ -222,11 +222,11 @@
   "/usr/local/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1781668108 5573038 b99aad5e4898a9034e953632f940512b ""
   "/usr/local/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1781668033 3636779 95e9e6cc02d6127d65dab0c6b29a5024 ""
   "/usr/local/texlive/2026/texmf.cnf" 1774209515 577 648cd9f92f9c0eac486f4c71c85cfbbe ""
-  "presentacion_tecnica.aux" 1784181088.10657 2662 7465164f2e7f4805f1dd1e97d6d96a4a "pdflatex"
-  "presentacion_tecnica.nav" 1784181088.10897 1109 07396102f9d82bf25877ba7d82798efb "pdflatex"
-  "presentacion_tecnica.out" 1784181087.60005 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "presentacion_tecnica.tex" 1784181068.52673 15903 7600df4bfbc3a35f933ed931c1d1eb56 ""
-  "presentacion_tecnica.vrb" 1784181088.03033 1517 ecf3052c494e6319f4832423067621e0 "pdflatex"
+  "presentacion_tecnica.aux" 1784389612.57168 2662 7465164f2e7f4805f1dd1e97d6d96a4a "pdflatex"
+  "presentacion_tecnica.nav" 1784389612.57363 1109 07396102f9d82bf25877ba7d82798efb "pdflatex"
+  "presentacion_tecnica.out" 1784389612.0679 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "presentacion_tecnica.tex" 1784389609.63218 15910 08e534fd6b6f235e6e72865bc2db35d5 ""
+  "presentacion_tecnica.vrb" 1784389612.4998 1517 ecf3052c494e6319f4832423067621e0 "pdflatex"
   (generated)
   "presentacion_tecnica.aux"
   "presentacion_tecnica.log"
