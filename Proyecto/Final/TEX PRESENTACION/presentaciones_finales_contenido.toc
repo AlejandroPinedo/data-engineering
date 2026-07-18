@@ -1,0 +1,15 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Introducción y Propósito}{2}{section.1}%
+\contentsline {section}{\numberline {2}Parte A: Presentación Ejecutiva (Negocio y Storytelling)}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Diapositiva 1: Carátula}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Diapositiva 2: El Contexto (El Negocio de Minera Los Andes)}{2}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Diapositiva 3: WHY (¿Por qué estamos haciendo esto?)}{2}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Diapositiva 4: HOW (¿Cómo lo estamos solucionando?)}{3}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Diapositiva 5: WHAT (¿Qué construimos?)}{3}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Diapositiva 6: WHAT (Aplicación de Data Mesh y Gobierno del Dato)}{3}{subsection.2.6}%
+\contentsline {subsection}{\numberline {2.7}Diapositiva 7: WHAT (Valor de Negocio Generado)}{3}{subsection.2.7}%
+\contentsline {subsection}{\numberline {2.8}Diapositiva 8: WHEN (Estado Actual y Hoja de Ruta)}{4}{subsection.2.8}%
+\contentsline {subsection}{\numberline {2.9}Diapositiva 9: Lecciones Aprendidas y Desafíos}{4}{subsection.2.9}%
+\contentsline {subsection}{\numberline {2.10}Diapositiva 10: Cierre}{4}{subsection.2.10}%
+\contentsline {section}{\numberline {3}Parte B: Estructura de la Presentación Técnica}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Estructura Diapositiva por Diapositiva}{5}{subsection.3.1}%
