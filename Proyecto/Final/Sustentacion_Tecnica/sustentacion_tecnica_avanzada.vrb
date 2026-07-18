@@ -1,0 +1,31 @@
+\frametitle{Reporte de SLAs del Portal de Datos}
+\begin{columns}
+        \begin{column}{0.48\textwidth}
+            \textbf{Monitoreo de SLAs de Consulta:}
+            \begin{itemize}
+                \setlength{\itemsep}{0.3em}
+                \item \textbf{Métricas de SLA:} Latencia promedio ($<2.5$ segundos) y porcentaje de éxito de consultas ($>99\%$).
+                \item \textbf{Seguridad de Catálogo:} Al no contar con privilegios en la tabla del sistema \texttt{system.query.history} en la interfaz interactiva, se mockeó el reporte con datos representativos realistas de uso de los Data Products.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{lstlisting}[language=SQL, caption=Estructura de la Vista de Auditoría]
+CREATE OR REPLACE VIEW gold.vw_dataproducts_audit AS
+SELECT
+  current_date() AS start_date,
+  'Reabastecimiento Critico' AS data_product,
+  12 AS total_consultas,
+  1.45 AS avg_duracion_total_sec,
+  12 AS consultas_exitosas,
+  0 AS consultas_fallidas
+UNION ALL
+SELECT
+  current_date() AS start_date,
+  'Consumo Historico' AS data_product,
+  8 AS total_consultas,
+  2.10 AS avg_duracion_total_sec,
+  7 AS consultas_exitosas,
+  1 AS consultas_fallidas;
+            \end{lstlisting}
+        \end{column}
+    \end{columns}
