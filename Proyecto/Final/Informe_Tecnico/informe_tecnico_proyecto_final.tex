@@ -26,7 +26,7 @@
     linkcolor=blue,
     filecolor=magenta,      
     urlcolor=cyan,
-    pdftitle={Informe Técnico de Proyecto Final},
+    pdftitle={Informe Técnico Detallado de Proyecto Final},
     pdfpagemode=FullScreen,
 }
 
@@ -43,7 +43,7 @@
     keywordstyle=\color{codeblue}\bfseries,
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\footnotesize, 
+    basicstyle=\ttfamily\scriptsize, 
     breakatwhitespace=false,         
     breaklines=true,                 
     captionpos=b,                    
@@ -69,8 +69,8 @@
 }
 
 % --- Metadatos del Documento ---
-\title{\textbf{Informe Técnico del Proyecto Final}\\
-\large Pipeline Medallion, Data Mesh y Gobernanza en Unity Catalog}
+\title{\textbf{Informe Técnico Detallado del Proyecto Final}\\
+\large Pipeline Medallion Resiliente, Data Mesh y Gobernanza en Unity Catalog}
 \author{\textbf{Maestría en Ciencia de Datos e Inteligencia Artificial} \\ Universidad de Ingeniería y Tecnología - UTEC \\ \textbf{Grupo G2 (Sección 1 - g102)}}
 \date{18 de Julio de 2026}
 
@@ -254,6 +254,231 @@ COMMENT ON COLUMN g102_log_reabastecimiento.gold.mv_replenishment_alerts.proveed
   IS 'Proveedor socio dueño del stock en consignacion';
 COMMENT ON COLUMN g102_log_reabastecimiento.gold.mv_replenishment_alerts.stock_actual 
   IS 'Inventario actual neto calculado acumulativamente (Ingresos - Salidas)';
+\end{lstlisting}
+
+\newpage
+% -------------------------------------------------------------------
+\section{Especificaciones Técnicas de los Data Products (Capa Gold)}
+% -------------------------------------------------------------------
+Esta sección detalla las declaraciones SQL DDL de creación de las vistas lógicas en la capa Gold y el catálogo completo de columnas documentadas para asegurar la transparencia e interoperabilidad en el esquema descentralizado.
+
+\subsection{Data Product 1: Alertas de Reabastecimiento Crítico}
+Este producto calcula la situación actual de los stocks y gatilla alertas proactivas.
+
+\begin{lstlisting}[language=SQL, caption=DDL de Creación de Alertas de Reabastecimiento]
+CREATE OR REPLACE VIEW g102_log_reabastecimiento.gold.mv_replenishment_alerts AS
+WITH stock_acumulado AS (
+  SELECT 
+    material_id, 
+    descripcion, 
+    proveedor, 
+    categoria, 
+    stock_seguridad, 
+    punto_reorden, 
+    costo_unitario_usd, 
+    SUM(cantidad) AS stock_actual
+  FROM g102_log_reabastecimiento.silver.silver_movimientos_consignacion
+  GROUP BY 
+    material_id, 
+    descripcion, 
+    proveedor, 
+    categoria, 
+    stock_seguridad, 
+    punto_reorden, 
+    costo_unitario_usd
+)
+SELECT 
+  material_id,
+  descripcion,
+  proveedor,
+  categoria,
+  stock_actual,
+  stock_seguridad,
+  punto_reorden,
+  CASE 
+    WHEN stock_actual < stock_seguridad THEN 'CRITICO - DESABASTECIMIENTO'
+    WHEN stock_actual < punto_reorden THEN 'REORDEN SUGERIDO'
+    ELSE 'NORMAL'
+  END AS estado_inventario,
+  (punto_reorden - stock_actual) AS cantidad_a_comprar,
+  ((punto_reorden - stock_actual) * costo_unitario_usd) AS costo_reposicion_usd
+FROM stock_acumulado
+WHERE stock_actual < punto_reorden;
+\end{lstlisting}
+
+\subsubsection{Diccionario de Datos de Alertas (Gold)}
+\begin{table}[h]
+    \centering
+    \footnotesize
+    \begin{tabular}{lll}
+        \toprule
+        \textbf{Nombre del Campo} & \textbf{Tipo de Dato} & \textbf{Descripción Técnica (Diccionario)} \\
+        \midrule
+        \texttt{material\_id} & \texttt{STRING} & Código único del material de SAP. \\
+        \texttt{descripcion} & \texttt{STRING} & Descripción técnica del repuesto crítico. \\
+        \texttt{proveedor} & \texttt{STRING} & Proveedor dueño del stock en consignación. \\
+        \texttt{categoria} & \texttt{STRING} & Categoría técnica de catalogación del repuesto. \\
+        \texttt{stock\_actual} & \texttt{DOUBLE} & Inventario neto acumulativo calculado en mina. \\
+        \texttt{stock\_seguridad} & \texttt{INTEGER} & Límite mínimo de stock tolerado antes de parada. \\
+        \texttt{punto\_reorden} & \texttt{INTEGER} & Umbral de alerta de compra configurado. \\
+        \texttt{estado\_inventario} & \texttt{STRING} & Alerta operativa (NORMAL, REORDEN, CRITICO). \\
+        \texttt{cantidad\_a\_comprar} & \texttt{DOUBLE} & Cantidad de unidades sugeridas para reposición. \\
+        \texttt{costo\_reposicion\_usd} & \texttt{DOUBLE} & Costo financiero total estimado para la compra. \\
+        \bottomrule
+    \end{tabular}
+    \caption{Diccionario de datos del Data Product de Alertas de Reabastecimiento.}
+\end{table}
+
+\subsection{Data Product 2: Análisis de Consumos y Costos Históricos}
+Este producto consolida las tendencias de consumo mensual para control de contratos de abastecimiento.
+
+\begin{lstlisting}[language=SQL, caption=DDL de Creación de Análisis de Consumos]
+CREATE OR REPLACE VIEW g102_log_consumos.gold.mv_consumption_analysis AS
+SELECT 
+  date_format(fecha_movimiento, 'yyyy-MM') AS anio_mes, 
+  material_id, 
+  descripcion, 
+  proveedor, 
+  categoria,
+  ABS(SUM(cantidad)) AS cantidad_consumida, 
+  ABS(SUM(monto_total_usd)) AS costo_consumo_usd
+FROM g102_log_reabastecimiento.silver.silver_movimientos_consignacion
+WHERE cantidad < 0  -- Filtrar solo consumos (salidas netas)
+GROUP BY 
+  date_format(fecha_movimiento, 'yyyy-MM'), 
+  material_id, 
+  descripcion, 
+  proveedor, 
+  categoria;
+\end{lstlisting}
+
+\subsubsection{Diccionario de Datos de Consumos (Gold)}
+\begin{table}[h]
+    \centering
+    \footnotesize
+    \begin{tabular}{lll}
+        \toprule
+        \textbf{Nombre del Campo} & \textbf{Tipo de Dato} & \textbf{Descripción Técnica (Diccionario)} \\
+        \midrule
+        \texttt{anio\_mes} & \texttt{STRING} & Período contable de análisis en formato AAAA-MM. \\
+        \texttt{material\_id} & \texttt{STRING} & Código único del material de SAP. \\
+        \texttt{descripcion} & \texttt{STRING} & Descripción técnica del repuesto. \\
+        \texttt{proveedor} & \texttt{STRING} & Proveedor del material consumido. \\
+        \texttt{categoria} & \texttt{STRING} & Clasificación técnica de catalogación. \\
+        \texttt{cantidad\_consumida} & \texttt{DOUBLE} & Cantidad total neta consumida físicamente en mina. \\
+        \texttt{costo\_consumo\_usd} & \texttt{DOUBLE} & Costo consolidado del consumo valorizado en USD. \\
+        \bottomrule
+    \end{tabular}
+    \caption{Diccionario de datos del Data Product de Análisis de Consumos.}
+\end{table}
+
+\subsection{Data Product 3: Conciliación Mensual de Pagos}
+Este producto expone los movimientos acumulados listos para ser pre-facturados por el proveedor socio.
+
+\begin{lstlisting}[language=SQL, caption=DDL de Creación de Conciliación de Pagos]
+CREATE OR REPLACE VIEW g102_fin_conciliacion.gold.mv_monthly_conciliation AS
+SELECT 
+  date_format(fecha_movimiento, 'yyyy-MM') AS anio_mes, 
+  proveedor, 
+  documento_material, 
+  material_id, 
+  descripcion, 
+  costo_unitario_usd,
+  ABS(SUM(cantidad)) AS cantidad_facturable, 
+  ABS(SUM(monto_total_usd)) AS monto_facturable_usd
+FROM g102_log_reabastecimiento.silver.silver_movimientos_consignacion
+WHERE cantidad < 0  -- Filtrar solo consumos
+GROUP BY 
+  date_format(fecha_movimiento, 'yyyy-MM'), 
+  proveedor, 
+  documento_material, 
+  material_id, 
+  descripcion, 
+  costo_unitario_usd;
+\end{lstlisting}
+
+\subsubsection{Diccionario de Datos de Conciliación (Gold)}
+\begin{table}[h]
+    \centering
+    \footnotesize
+    \begin{tabular}{lll}
+        \toprule
+        \textbf{Nombre del Campo} & \textbf{Tipo de Dato} & \textbf{Descripción Técnica (Diccionario)} \\
+        \midrule
+        \texttt{anio\_mes} & \texttt{STRING} & Período contable de liquidación (AAAA-MM). \\
+        \texttt{proveedor} & \texttt{STRING} & Proveedor dueño a quien se emitirá el pago. \\
+        \texttt{documento\_material} & \texttt{STRING} & Clave única de la transacción (Documento SAP). \\
+        \texttt{material\_id} & \texttt{STRING} & Código único del material de SAP. \\
+        \texttt{descripcion} & \texttt{STRING} & Descripción técnica del repuesto. \\
+        \texttt{costo\_unitario\_usd} & \texttt{DOUBLE} & Precio pactado en contrato por unidad de material. \\
+        \texttt{cantidad\_facturable} & \texttt{DOUBLE} & Volumen total acumulado a ser liquidado. \\
+        \texttt{monto\_facturable\_usd} & \texttt{DOUBLE} & Costo total a facturar por documento de material. \\
+        \bottomrule
+    \end{tabular}
+    \caption{Diccionario de datos del Data Product de Conciliación de Pagos.}
+\end{table}
+
+\newpage
+% -------------------------------------------------------------------
+\section{Especificaciones de Contrato de Datos (Data Contracts)}
+% -------------------------------------------------------------------
+Para garantizar la fiabilidad del consumo descentralizado entre dominios de datos, se definieron contratos de datos bajo especificación YAML. Estos contratos actúan como un acuerdo de nivel de servicio (SLA) de metadatos y calidad entre el dominio productor (Logística) y los consumidores (Planeadores de compras y Finanzas).
+
+A continuación se detalla la especificación del contrato de datos del **DP1: Alertas de Reabastecimiento**:
+
+\begin{lstlisting}[language=SQL, caption=Contrato de Datos YAML del Data Product de Alertas]
+data_product: reabastecimiento
+domain: logistica
+table: mv_replenishment_alerts
+version: 1.0.0
+owner: herles.pinedo@utec.edu.pe
+generated_at: '2026-07-15T20:14:45'
+expectations:
+  freshness:
+    frequency: daily
+    cron: "0 1 * * *"
+    timezone: America/Lima
+  quality_rules:
+    - name: val_material_id
+      rule: "material_id IS NOT NULL"
+      level: error
+    - name: val_stock_seguridad
+      rule: "stock_seguridad >= 0"
+      level: error
+    - name: val_estado_inventario
+      rule: "estado_inventario IN ('NORMAL', 'REORDEN SUGERIDO', 'CRITICO - DESABASTECIMIENTO')"
+      level: error
+schema:
+  - name: material_id
+    type: string
+    description: Codigo unico de material de SAP (Material ID)
+  - name: descripcion
+    type: string
+    description: Descripcion del repuesto critico en consignacion
+  - name: proveedor
+    type: string
+    description: Proveedor dueño del stock en consignacion
+  - name: categoria
+    type: string
+    description: Clasificacion de categoria del repuesto
+  - name: stock_actual
+    type: double
+    description: Inventario actual neto acumulado en mina
+  - name: stock_seguridad
+    type: int
+    description: Nivel minimo del material requerido en almacen
+  - name: punto_reorden
+    type: int
+    description: Nivel de alerta que gatilla la compra
+  - name: estado_inventario
+    type: string
+    description: Alerta operativa (NORMAL, REORDEN, CRITICO)
+  - name: cantidad_a_comprar
+    type: double
+    description: Unidades sugeridas para reposicion
+  - name: costo_reposicion_usd
+    type: double
+    description: Costo financiero total estimado para la compra
 \end{lstlisting}
 
 \end{document}

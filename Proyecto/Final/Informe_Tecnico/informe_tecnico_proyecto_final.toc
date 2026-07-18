@@ -20,3 +20,11 @@
 \contentsline {subsection}{\numberline {4.2}Orquestación del Pipeline (Databricks Workflows)}{7}{subsection.4.2}%
 \contentsline {subsection}{\numberline {4.3}Catálogo de Datos en Unity Catalog}{7}{subsection.4.3}%
 \contentsline {subsection}{\numberline {4.4}Diccionario de Datos en Metastore}{7}{subsection.4.4}%
+\contentsline {section}{\numberline {5}Especificaciones Técnicas de los Data Products (Capa Gold)}{8}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Data Product 1: Alertas de Reabastecimiento Crítico}{8}{subsection.5.1}%
+\contentsline {subsubsection}{\numberline {5.1.1}Diccionario de Datos de Alertas (Gold)}{8}{subsubsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.2}Data Product 2: Análisis de Consumos y Costos Históricos}{8}{subsection.5.2}%
+\contentsline {subsubsection}{\numberline {5.2.1}Diccionario de Datos de Consumos (Gold)}{9}{subsubsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.3}Data Product 3: Conciliación Mensual de Pagos}{9}{subsection.5.3}%
+\contentsline {subsubsection}{\numberline {5.3.1}Diccionario de Datos de Conciliación (Gold)}{10}{subsubsection.5.3.1}%
+\contentsline {section}{\numberline {6}Especificaciones de Contrato de Datos (Data Contracts)}{11}{section.6}%
