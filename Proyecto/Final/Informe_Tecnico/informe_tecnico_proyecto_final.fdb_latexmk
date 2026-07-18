@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1784393554.92643 "/Users/herivera/Documents/MAESTRIA/Data Engineering/Proyecto/Final/Informe_Tecnico/informe_tecnico_proyecto_final.tex" "informe_tecnico_proyecto_final.pdf" "informe_tecnico_proyecto_final" 1784393555.84476 2
-  "/Users/herivera/Documents/MAESTRIA/Data Engineering/Proyecto/Final/Informe_Tecnico/informe_tecnico_proyecto_final.tex" 1784393536.74997 16265 c016a6ba707a59c30a439f2032ad0741 ""
+["pdflatex"] 1784393811.01396 "/Users/herivera/Documents/MAESTRIA/Data Engineering/Proyecto/Final/Informe_Tecnico/informe_tecnico_proyecto_final.tex" "informe_tecnico_proyecto_final.pdf" "informe_tecnico_proyecto_final" 1784393811.92497 2
+  "/Users/herivera/Documents/MAESTRIA/Data Engineering/Proyecto/Final/Informe_Tecnico/informe_tecnico_proyecto_final.tex" 1784393809.47522 16002 7bf64d16f4d761e8fac7b799e5bd0869 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/jknappen/ec/tcbx1095.tfm" 1136768653 1536 0adca69c597a47fe7664bf81057bb53b ""
@@ -175,10 +175,10 @@
   "/usr/local/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1781668108 5573038 b99aad5e4898a9034e953632f940512b ""
   "/usr/local/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1781668033 3636779 95e9e6cc02d6127d65dab0c6b29a5024 ""
   "/usr/local/texlive/2026/texmf.cnf" 1774209515 577 648cd9f92f9c0eac486f4c71c85cfbbe ""
-  "informe_tecnico_proyecto_final.aux" 1784393555.73601 3707 facaad72f280bf5d71ff5231cc27451d "pdflatex"
-  "informe_tecnico_proyecto_final.out" 1784393555.73781 6350 efcb2f0844b52c9fc77a142ce9802726 "pdflatex"
-  "informe_tecnico_proyecto_final.tex" 1784393536.74997 16265 c016a6ba707a59c30a439f2032ad0741 ""
-  "informe_tecnico_proyecto_final.toc" 1784393555.73871 2348 05db83f632a3c4121944344e15960606 "pdflatex"
+  "informe_tecnico_proyecto_final.aux" 1784393811.82015 3511 f7707ecc5a4fb647f7041ca0b147a77d "pdflatex"
+  "informe_tecnico_proyecto_final.out" 1784393811.82196 5299 3e329693d2c9ca94d2acaff0e35875c3 "pdflatex"
+  "informe_tecnico_proyecto_final.tex" 1784393809.47522 16002 7bf64d16f4d761e8fac7b799e5bd0869 ""
+  "informe_tecnico_proyecto_final.toc" 1784393811.8225 2152 dc01be2577d8d1b75c94b761e75a5f67 "pdflatex"
   (generated)
   "informe_tecnico_proyecto_final.aux"
   "informe_tecnico_proyecto_final.log"

@@ -1,22 +1,22 @@
 \babel@toc {spanish}{}\relax 
 \contentsline {section}{\numberline {1}Valor del Data Product}{2}{section.1}%
-\contentsline {subsection}{\numberline {1.1}¿Qué problema o necesidad de negocio resuelve el Data Product?}{2}{subsection.1.1}%
-\contentsline {subsection}{\numberline {1.2}¿Quiénes son sus consumidores y cómo utilizarían la información?}{2}{subsection.1.2}%
-\contentsline {subsection}{\numberline {1.3}¿Qué valor aporta al negocio y qué decisiones facilita?}{2}{subsection.1.3}%
-\contentsline {subsection}{\numberline {1.4}¿Qué datos alimentan el Data Product y cuál es su origen?}{3}{subsection.1.4}%
+\contentsline {subsection}{\numberline {1.1}Problema y Necesidad de Negocio a Resolver}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Consumidores y Utilización de la Información}{2}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Valor al Negocio y Decisiones Soportadas}{2}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Datos de Alimentación y Origen de Datos}{3}{subsection.1.4}%
 \contentsline {section}{\numberline {2}Diseño del Data Product y Aplicación de Data Mesh}{4}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Definición del dominio al que pertenece el Data Product}{4}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Justificación del diseño del Data Product}{4}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Explicación de cómo se aplican los principios de Data Mesh}{4}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Diagrama conceptual de la arquitectura}{4}{subsection.2.4}%
-\contentsline {subsection}{\numberline {2.5}Esquema de consumo del Data Product}{4}{subsection.2.5}%
-\contentsline {subsection}{\numberline {2.6}Propuesta de gobierno del dato}{4}{subsection.2.6}%
+\contentsline {subsection}{\numberline {2.1}Definición del Dominio de Negocio}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Justificación del Diseño}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Aplicación de los Principios de Data Mesh}{4}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Diagrama Conceptual de la Arquitectura}{4}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Esquema de Consumo de Datos}{4}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Propuesta de Gobierno de Datos}{4}{subsection.2.6}%
 \contentsline {section}{\numberline {3}Implementación del Pipeline de Datos}{6}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Descripción del flujo de datos desde Bronze hasta Gold}{6}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Transformaciones realizadas en la capa Silver}{6}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Tablas finales generadas en Gold}{6}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.1}Flujo de Datos desde Bronze hasta Gold}{6}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Transformaciones Realizadas en la Capa Silver}{6}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Tablas Finales Generadas en Gold}{6}{subsection.3.3}%
 \contentsline {section}{\numberline {4}Calidad de la Implementación en Databricks}{7}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Organización de notebooks}{7}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Pipeline implementado y funcional (Databricks Workflows)}{7}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Catálogo de datos generado (Unity Catalog)}{7}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Diccionario de datos documentado en Unity Catalog}{7}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.1}Organización de Notebooks}{7}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Orquestación del Pipeline (Databricks Workflows)}{7}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Catálogo de Datos en Unity Catalog}{7}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Diccionario de Datos en Metastore}{7}{subsection.4.4}%

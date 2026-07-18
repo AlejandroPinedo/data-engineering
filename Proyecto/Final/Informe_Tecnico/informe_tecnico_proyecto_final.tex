@@ -14,6 +14,9 @@
 \usepackage{hyperref}
 \usepackage{enumitem}
 
+% Desactivar completamente el guionado (corte de palabras con guion medio) en el documento
+\usepackage[none]{hyphenat}
+
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds}
 
@@ -56,12 +59,13 @@
 
 % --- Estilos de Diagramas TikZ ---
 \tikzset{
-    storage/.style={draw=gray!80, cylinder, fill=gray!10, text width=3.8cm, align=center, minimum height=1cm, thick},
-    layer/.style={draw=blue!80, rectangle, rounded corners=3pt, fill=blue!5, text width=4.5cm, align=center, minimum height=0.9cm, thick},
-    process/.style={draw=cyan!80, rectangle, fill=cyan!5, text width=4.2cm, align=center, minimum height=0.8cm, thick},
-    errBlock/.style={draw=red!80, rectangle, rounded corners=3pt, fill=red!5, text width=4.5cm, align=center, minimum height=0.9cm, thick},
+    source/.style={draw=gray!80, rectangle, rounded corners=2pt, fill=gray!5, text width=3.8cm, align=center, minimum height=0.7cm, scale=0.75, thick},
+    airflow/.style={draw=orange!80, rectangle, rounded corners=3pt, fill=orange!5, text width=3.8cm, align=center, minimum height=0.7cm, scale=0.75, thick},
+    storage/.style={draw=gray!80, cylinder, fill=gray!10, text width=3.8cm, align=center, minimum height=0.8cm, scale=0.75, thick},
+    layer/.style={draw=blue!80, rectangle, rounded corners=3pt, fill=blue!5, text width=4.5cm, align=center, minimum height=0.8cm, scale=0.75, thick},
+    errBlock/.style={draw=red!80, rectangle, rounded corners=3pt, fill=red!5, text width=4.2cm, align=center, minimum height=0.8cm, scale=0.75, thick},
     arrow/.style={-Stealth, thick, draw=gray!80},
-    darrow/.style={={Stealth[scale=1.2]}-{Stealth[scale=1.2]}, dashed, thick, draw=blue!70}
+    darrow/.style={-Stealth, dashed, thick, draw=red!70}
 }
 
 % --- Metadatos del Documento ---
@@ -133,23 +137,47 @@ El Data Product se diseñó con un enfoque descentralizado para evitar los cuell
 \end{enumerate}
 
 \subsection{Diagrama Conceptual de la Arquitectura}
-A continuación se detalla el flujo de datos unificado de las capas de procesamiento:
+A continuación se detalla el flujo de datos unificado y detallado desde el origen local hasta la capa de consumo:
 
 \begin{figure}[h]
     \centering
-    \begin{tikzpicture}[node distance=1.4cm, auto, >=latex', thick]
-        \node[storage] (raw) {Azure Data Lake Raw\\(CSVs Ingestados)};
-        \node[layer, below=of raw] (bronze) {\textbf{Capa Bronze (Inmutable)}\\ Estandarización de columnas Delta};
-        \node[layer, below=of bronze] (silver) {\textbf{Capa Silver (Calidad/PII)}\\ try\_cast, ltrim, UDF enmascaradora};
-        \node[layer, below=of silver] (gold) {\textbf{Capa Gold (Data Products)}\\ 3 SQL Views Semánticas};
-        \node[errBlock, below right=1cm and 0.5cm of silver, text width=4.5cm] (quarantine) {\textbf{Capa de Cuarentena}\\ Registros con fallas de calidad};
+    \begin{tikzpicture}[node distance=0.8cm, auto, >=latex', thick]
+        % Capa de Origen y Carga (Airflow)
+        \node[source] (sap) {ERP SAP Local (Mina)\\ (CSVs MB51 / Maestro)};
+        \node[airflow, below=of sap] (airflow) {Apache Airflow (Local VM)\\ (FileSensor / WasbOperator)};
+        \node[storage, below=of airflow] (adls) {Azure Data Lake Storage (ADLS)\\ Contenedor 'raw'};
         
-        \draw[arrow] (raw) -- (bronze);
+        % Capas Medallion (Databricks Workspace)
+        \node[layer, below=of adls] (bronze) {\textbf{Capa Bronze (Delta Lake)}\\ Estandarización de nombres \\ e inyección de metadata};
+        \node[layer, below=of bronze] (silver) {\textbf{Capa Silver (Delta Lake)}\\ try\_cast de cantidades y fechas \\ Cruce ltrim con Maestro e inyección 561};
+        \node[layer, below=of silver] (gold) {\textbf{Capa Gold (Data Products)}\\ 3 Vistas Semánticas en catálogos \\ g102\_log\_reabast, consumos, fin\_concil};
+        
+        % Bifurcaciones laterales de Calidad y Gobernanza
+        \node[errBlock, right=1.2cm of silver] (quarantine) {\textbf{Capa de Cuarentena (Delta)}\\ silver\_movimientos\_cuarentena \\ (Fallo de Calidad / Cero / Nulos)};
+        
+        \node[source, left=1.2cm of silver, fill=green!5, draw=green!80] (saldos) {Saldos Iniciales Virtuales\\ (Movimiento 561 de SAP)};
+        
+        % Capa de Consumo y BI
+        \node[source, below=of gold, fill=cyan!10, draw=cyan!80, text width=5cm] (bi) {Visualización y BI\\ Databricks Lakeview Dashboard \\ (Filtros por Proveedor / Período)};
+
+        % Conexiones de flujo
+        \draw[arrow] (sap) -- (airflow);
+        \draw[arrow] (airflow) -- (adls);
+        \draw[arrow] (adls) -- (bronze);
         \draw[arrow] (bronze) -- (silver);
         \draw[arrow] (silver) -- (gold);
-        \draw[arrow, dashed, draw=red] (silver) -| (quarantine);
+        \draw[arrow] (gold) -- (bi);
+        
+        % Flujo de Cuarentena y Saldos
+        \draw[darrow] (silver) -- node[above, scale=0.6, text=red] {Fallo Regla} (quarantine);
+        \draw[arrow, draw=green!80, dashed] (saldos) -- node[above, scale=0.6, text=green!60!black] {Union} (silver);
+
+        % Contenedor Databricks usando scope de backgrounds
+        \begin{scope}[on background layer]
+            \node[draw=blue!40, dashed, fill=blue!2, fill opacity=0.03, rounded corners=5pt, fit=(bronze) (silver) (gold) (quarantine) (saldos), label={[shift={(0,-0.6)}, scale=0.75]right:\textbf{Databricks Workspace (Medallion \& Unity Catalog)}}] (databricks) {};
+        \end{scope}
     \end{tikzpicture}
-    \caption{Arquitectura Medallion de procesamiento de inventarios.}
+    \caption{Flujo técnico y arquitectura de datos detallada de inventarios.}
 \end{figure}
 
 \subsection{Esquema de Consumo de Datos}
