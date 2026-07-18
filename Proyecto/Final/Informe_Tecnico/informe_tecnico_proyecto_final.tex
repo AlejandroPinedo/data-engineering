@@ -13,6 +13,7 @@
 \usepackage{colortbl}
 \usepackage{hyperref}
 \usepackage{enumitem}
+
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds}
 
@@ -39,7 +40,7 @@
     keywordstyle=\color{codeblue}\bfseries,
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\footnotesize, % Tamaño de fuente compacto
+    basicstyle=\ttfamily\footnotesize, 
     breakatwhitespace=false,         
     breaklines=true,                 
     captionpos=b,                    
@@ -53,7 +54,7 @@
 }
 \lstset{style=reportstyle}
 
-% --- Estilos de Diagramas TikZ (Mejorado con paleta moderna UTEC/Databricks) ---
+% --- Estilos de Diagramas TikZ ---
 \tikzset{
     storage/.style={draw=gray!80, cylinder, fill=gray!10, text width=3.8cm, align=center, minimum height=1cm, thick},
     layer/.style={draw=blue!80, rectangle, rounded corners=3pt, fill=blue!5, text width=4.5cm, align=center, minimum height=0.9cm, thick},
@@ -79,8 +80,8 @@
 \section{Valor del Data Product}
 % -------------------------------------------------------------------
 
-\subsection{¿Qué problema o necesidad de negocio resuelve el Data Product?}
-En la operación de la empresa minera, la continuidad de las actividades a tajo abierto y de la planta concentradora depende del abastecimiento oportuno de repuestos pesados y consumibles técnicos. La compañía utiliza un modelo de **inventario en consignación**, en el cual los materiales se almacenan físicamente en los almacenes del sitio minero, pero pertenecen legalmente a los proveedores (como Ferreyros, Komatsu o Shell) hasta que se registra su consumo.
+\subsection{Problema y Necesidad de Negocio a Resolver}
+En la operación de la empresa minera, la continuidad de las actividades a tajo abierto y de la planta concentradora depende del abastecimiento oportuno de repuestos pesados y consumibles técnicos. La compañía utiliza un modelo de \textbf{inventario en consignación}, en el cual los materiales se almacenan físicamente en los almacenes del sitio minero, pero pertenecen legalmente a los proveedores (como Ferreyros, Komatsu o Shell) hasta que se registra su consumo.
 
 El problema radica en la falta de visibilidad en tiempo real de los movimientos de inventario (ingresos, retiros y devoluciones). Anteriormente, el control de inventarios se realizaba de manera local en el ERP SAP y se enviaban reportes manuales en hojas de cálculo por correo electrónico cada semana. Esto generaba las siguientes ineficiencias:
 \begin{itemize}
@@ -89,15 +90,15 @@ El problema radica en la falta de visibilidad en tiempo real de los movimientos 
     \item \textbf{Demoras en Conciliación y Facturación:} El proceso de validación contable mensual para facturar los consumos demoraba días en conciliarse por discrepancias manuales entre los sistemas contables.
 \end{itemize}
 
-\subsection{¿Quiénes son sus consumidores y cómo utilizarían la información?}
+\subsection{Consumidores y Utilización de la Información}
 El sistema expone tres Data Products específicos orientados a diferentes roles del negocio:
 \begin{enumerate}
-    \item \textbf{Planeadores de Mantenimiento y Compras:} Consumen el **DP1 (Alertas de Reabastecimiento)**. Utilizan las alertas de stock crítico para generar órdenes de reposición automáticas antes de que ocurra un quiebre físico de stock.
-    \item \textbf{Gerencia de Logística y Contratos:} Consumen el **DP2 (Análisis de Consumo)**. Evalúan el costo de consumos mensual consolidado por categoría para la renegociación de contratos marco con proveedores.
-    \item \textbf{Contabilidad, Finanzas y Proveedores:} Consumen el **DP3 (Conciliación de Pagos)**. Extraen el registro de retiros mensuales pre-aprobados para agilizar la facturación electrónica sin conciliaciones manuales.
+    \item \textbf{Planeadores de Mantenimiento y Compras:} Consumen el \textbf{DP1 (Alertas de Reabastecimiento)}. Utilizan las alertas de stock crítico para generar órdenes de reposición automáticas antes de que ocurra un quiebre físico de stock.
+    \item \textbf{Gerencia de Logística y Contratos:} Consumen el \textbf{DP2 (Análisis de Consumo)}. Evalúan el costo de consumos mensual consolidado por categoría para la renegociación de contratos marco con proveedores.
+    \item \textbf{Contabilidad, Finanzas y Proveedores:} Consumen el \textbf{DP3 (Conciliación de Pagos)}. Extraen el registro de retiros mensuales pre-aprobados para agilizar la facturación electrónica sin conciliaciones manuales.
 \end{enumerate}
 
-\subsection{¿Qué valor aporta al negocio y qué decisiones facilita?}
+\subsection{Valor al Negocio y Decisiones Soportadas}
 La arquitectura de Data Products descentralizados aporta los siguientes beneficios:
 \begin{itemize}
     \item \textbf{Compras Proactivas:} Reduce el riesgo de paradas operativas por falta de stock crítico mediante notificaciones automáticas basadas en el punto de reorden.
@@ -105,11 +106,11 @@ La arquitectura de Data Products descentralizados aporta los siguientes benefici
     \item \textbf{Eficiencia Administrativa:} Automatiza la pre-facturación mensual, reduciendo el ciclo de facturación de 15 días a menos de 24 horas y eliminando discrepancias.
 \end{itemize}
 
-\subsection{¿Qué datos alimentan el Data Product y cuál es su origen?}
+\subsection{Datos de Alimentación y Origen de Datos}
 El pipeline procesa dos conjuntos de datos:
 \begin{enumerate}
     \item \textbf{Registro de Movimientos de SAP (MB51):} Archivos diarios en formato CSV exportados automáticamente desde el ERP SAP local de la mina. Contiene variables como \texttt{Material}, \texttt{Posting\_Date}, \texttt{Quantity}, \texttt{Amt\_in\_Loc\_Cur\_}, \texttt{Movement\_Type}, \texttt{Special\_Stock}, \texttt{Storage\_Location} y \texttt{User\_Name}.
-    \item \textbf{Catálogo Maestro de Materiales:} Archivo CSV mantenido por planeamiento que contiene los metadatos de los repuestos: ID de material, descripción técnica, proveedor dueño, costo unitario en USD, categoría, stock de seguridad y punto de reorden.
+    \item \textbf{Catálogo Maestro de Materiales:} Archivo CSV de planeamiento con los metadatos de los repuestos: ID de material, descripción técnica, proveedor dueño, costo unitario en USD, categoría, stock de seguridad y punto de reorden.
 \end{enumerate}
 
 \newpage
@@ -117,13 +118,13 @@ El pipeline procesa dos conjuntos de datos:
 \section{Diseño del Data Product y Aplicación de Data Mesh}
 % -------------------------------------------------------------------
 
-\subsection{Definición del dominio al que pertenece el Data Product}
+\subsection{Definición del Dominio de Negocio}
 El sistema se ubica en el dominio de \textbf{Logística y Gestión de la Cadena de Suministro} de la minera, el cual es el propietario de la ingesta y transformación (Domain Ownership). La visualización de conciliación y facturación conecta directamente con el dominio de \textbf{Finanzas}.
 
-\subsection{Justificación del diseño del Data Product}
+\subsection{Justificación del Diseño}
 El Data Product se diseñó con un enfoque descentralizado para evitar los cuellos de botella de los Data Lakes monolíticos. Cada producto de datos expuesto en Gold es una vista semántica unificada, documentada con comentarios en Unity Catalog y respaldada por un contrato de datos en YAML. Esto garantiza la autonomía y permite que los usuarios consuman la información de manera autoservicio.
 
-\subsection{Explicación de cómo se aplican los principios de Data Mesh}
+\subsection{Aplicación de los Principios de Data Mesh}
 \begin{enumerate}
     \item \textbf{Propiedad Orientada al Dominio (Domain Ownership):} El equipo de Logística es el responsable de sus pipelines, ingestión y diccionarios, respondiendo por la calidad de sus datos.
     \item \textbf{Los Datos como un Producto (Data as a Product):} Los Data Products de Gold son descubribles, legibles y gobernados, con SLAs de latencia de consulta ($<2.5$ segundos) y frecuencia de actualización diaria.
@@ -131,7 +132,7 @@ El Data Product se diseñó con un enfoque descentralizado para evitar los cuell
     \item \textbf{Gobernanza Computacional Federada:} Implementación de enmascaramiento dinámico de datos sensibles y contratos de datos YAML integrados en Unity Catalog.
 \end{enumerate}
 
-\subsection{Diagrama conceptual de la arquitectura}
+\subsection{Diagrama Conceptual de la Arquitectura}
 A continuación se detalla el flujo de datos unificado de las capas de procesamiento:
 
 \begin{figure}[h]
@@ -151,14 +152,14 @@ A continuación se detalla el flujo de datos unificado de las capas de procesami
     \caption{Arquitectura Medallion de procesamiento de inventarios.}
 \end{figure}
 
-\subsection{Esquema de consumo del Data Product}
+\subsection{Esquema de Consumo de Datos}
 Los Data Products son consumidos en dos niveles:
 \begin{itemize}
     \item \textbf{Consumo Directo (SQL/API):} Analistas de datos realizan consultas SQL directas sobre las vistas del catálogo de Gold en Unity Catalog.
     \item \textbf{Consumo Visual (Databricks Lakeview Dashboard):} Los planeadores y proveedores consumen la información de forma interactiva desde un portal interactivo filtrable por Proveedor y Mes.
 \end{itemize}
 
-\subsection{Propuesta de gobierno del dato}
+\subsection{Propuesta de Gobierno de Datos}
 \begin{itemize}
     \item \textbf{Dominio Responsable:} Logística (Ingeniería de Datos y Cadena de Suministro).
     \item \textbf{Dueño del Producto (Data Product Owner):} \texttt{herles.pinedo@utec.edu.pe} (Líder de Logística del Grupo G2).
@@ -170,20 +171,20 @@ Los Data Products son consumidos en dos niveles:
 \section{Implementación del Pipeline de Datos}
 % -------------------------------------------------------------------
 
-\subsection{Descripción del flujo de datos desde Bronze hasta Gold}
+\subsection{Flujo de Datos desde Bronze hasta Gold}
 El pipeline se divide en tres notebooks secuenciales orquestados por Databricks Workflows:
 1. \textbf{Bronze (Notebook 1):} Lee del ADLS Gen2, limpia los nombres de columna reemplazando espacios y puntos por guiones bajos para prevenir excepciones Delta, y guarda la data tal como viene en Delta Lake con marcas de linaje (\texttt{ingested\_at}).
 2. \textbf{Silver (Notebook 2):} Valida y limpia la data de movimientos SAP. Realiza un \texttt{union} con la tabla de saldos iniciales generados virtualmente, realiza un cruce Left Join con el catálogo maestro de materiales, evalúa la calidad y desvía la data corrupta a la tabla de Cuarentena. Aplica el enmascaramiento dinámico PII al usuario SAP.
 3. \textbf{Gold (Notebook 3):} Construye las tres vistas lógicas semánticas de los Data Products.
 
-\subsection{Transformaciones realizadas en la capa Silver}
+\subsection{Transformaciones Realizadas en la Capa Silver}
 \begin{itemize}
     \item \textbf{Estandarización de Claves:} Uso de \texttt{ltrim(col, '0')} para quitar ceros a la izquierda en los IDs de materiales SAP para garantizar el cruce con el maestro de materiales y resolver la cuarentena masiva de 233.69K registros.
     \item \textbf{Parseo de Fechas:} Conversión de los formatos de fecha regionalizada de SAP a tipo Date mediante \texttt{coalesce} y \texttt{try\_to\_date}.
     \item \textbf{Conversión Numérica Regional:} Reemplazo de comas decimales por puntos en Spark con regex y casteo a double mediante \texttt{try\_cast} para evitar fallos por datos regionales de SAP.
 \end{itemize}
 
-\subsection{Tablas finales generadas en Gold}
+\subsection{Tablas Finales Generadas en Gold}
 Se implementaron 3 vistas en Gold:
 1. \textbf{DP1: Alertas de Reabastecimiento Crítico (\texttt{gold.mv\_replenishment\_alerts}):} Vista que expone el stock acumulado de materiales que se encuentran por debajo del stock de seguridad y sugiere compras inmediatas calculando su costo de reposición.
 2. \textbf{DP2: Análisis de Consumo y Costos (\texttt{gold.mv\_consumption\_analysis}):} Agrupación histórica mensual en USD de las salidas de almacén para control de contratos.
@@ -194,25 +195,25 @@ Se implementaron 3 vistas en Gold:
 \section{Calidad de la Implementación en Databricks}
 % -------------------------------------------------------------------
 
-\subsection{Organización de notebooks}
+\subsection{Organización de Notebooks}
 El proyecto final está estructurado en 4 notebooks lógicos e independientes dentro de la carpeta del espacio de trabajo:
 * \texttt{Notebook 1: Capa Bronze} (Ingesta e Inmutabilidad).
 * \texttt{Notebook 2: Capa Silver} (Calidad, Cuarentena, PII y Enriquecimiento).
 * \texttt{Notebook 3: Capa Gold} (Consolidación de los 3 Data Products).
 * \texttt{Notebook 4: Gobernanza} (Comentarios de Diccionario y Contratos de Datos YAML).
 
-\subsection{Pipeline implementado y funcional (Databricks Workflows)}
+\subsection{Orquestación del Pipeline (Databricks Workflows)}
 Se configuró un Job de Databricks programado con la siguiente topología de ejecución secuencial automática:
 $$\text{Task 1: Ingesta Bronze} \longrightarrow \text{Task 2: Silver} \longrightarrow \text{Task 3: Vistas Gold} \longrightarrow \text{Task 4: Gobernanza}$$
-El Job está configurado en la zona horaria local (\texttt{America/Lima}) y se ejecuta de forma diaria a la **01:00 AM** con políticas de reintento automático y notificaciones por correo en caso de fallos.
+El Job está configurado en la zona horaria local (\texttt{America/Lima}) y se ejecuta de forma diaria a la \textbf{01:00 AM} con políticas de reintento automático y notificaciones por correo en caso de fallos.
 
-\subsection{Catálogo de datos generado (Unity Catalog)}
+\subsection{Catálogo de Datos en Unity Catalog}
 Se implementó un esquema de gobernanza federado en Unity Catalog bajo la nomenclatura de catálogo oficial para el grupo \textbf{g102}:
 * Catálogo de Ingestión y Alertas: \texttt{g102\_log\_reabastecimiento} (Esquemas Bronze, Silver y Gold).
 * Catálogo de Análisis de Consumos: \texttt{g102\_log\_consumos} (Esquema Gold).
 * Catálogo de Finanzas y Pagos: \texttt{g102\_fin\_conciliacion} (Esquema Gold).
 
-\subsection{Diccionario de datos documentado en Unity Catalog}
+\subsection{Diccionario de Datos en Metastore}
 A continuación se muestra la inyección de comentarios realizada en el Notebook 4 para documentar el diccionario directamente en el metastore de Unity Catalog:
 
 \begin{lstlisting}[language=SQL]
